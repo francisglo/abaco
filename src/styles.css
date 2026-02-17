@@ -1,0 +1,11 @@
+:root{
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --accent:#1f6feb;
+}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0; background:var(--bg); color:#111}
+.app-header{padding:24px; background:linear-gradient(90deg,var(--accent),#3aa0ff); color:#fff}
+.app-header h1{margin:0}
+.dashboard{padding:20px}
+.cards{display:flex; gap:12px; margin-top:12px}
+.card{background:var(--card); padding:16px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08); flex:1}
