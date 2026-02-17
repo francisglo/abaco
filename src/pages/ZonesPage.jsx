@@ -1,39 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import { fetchZones, createZone, updateZone, deleteZone } from '../api'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchZones, createZone, updateZone, deleteZone } from '../store/zonesSlice'
 import ZoneForm from '../components/ZoneForm'
 import ProtectedRoute from '../components/ProtectedRoute'
 
 export default function ZonesPage() {
-  const [zones, setZones] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch()
+  const { zones, loading, error } = useSelector(state => state.zones)
   const [editing, setEditing] = useState(null)
 
   useEffect(() => {
-    setLoading(true)
-    fetchZones()
-      .then(data => { setZones(data); setLoading(false) })
-      .catch(err => { setError(err.message); setLoading(false) })
-  }, [])
+    if (!zones || zones.length === 0) dispatch(fetchZones())
+  }, [dispatch])
 
   function handleCreate(payload) {
-    createZone(payload)
-      .then(newZone => setZones(prev => [...prev, newZone]))
-      .catch(err => setError(err.message))
+    dispatch(createZone(payload))
   }
 
   function handleUpdate(payload) {
-    updateZone(payload.id, payload)
-      .then(updated => setZones(prev => prev.map(z => z.id === updated.id ? updated : z)))
-      .then(() => setEditing(null))
-      .catch(err => setError(err.message))
+    dispatch(updateZone({ id: payload.id, payload }))
+    setEditing(null)
   }
 
   function handleDelete(id) {
     if (!confirm('¿Eliminar zona?')) return
-    deleteZone(id)
-      .then(() => setZones(prev => prev.filter(z => z.id !== id)))
-      .catch(err => setError(err.message))
+    dispatch(deleteZone(id))
   }
 
   return (
