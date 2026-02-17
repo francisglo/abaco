@@ -1,0 +1,46 @@
+{
+  "users": [
+    { "id": 1, "name": "Admin Local", "email": "admin@abaco.local", "role": "admin" },
+    { "id": 2, "name": "Operador Campo", "email": "field@abaco.local", "role": "operator" }
+  ],
+  "zones": [
+    { "id": 1, "name": "Zona Norte", "priority": 1 },
+    { "id": 2, "name": "Zona Sur", "priority": 2 }
+  ],
+  "neighborhoods": [
+    { "id": 1, "zoneId": 1, "name": "Barrio Centro" },
+    { "id": 2, "zoneId": 1, "name": "Barrio Alto" },
+    { "id": 3, "zoneId": 2, "name": "Barrio Costa" }
+  ],
+  "sectors": [
+    { "id": 1, "neighborhoodId": 1, "name": "Sector A" },
+    { "id": 2, "neighborhoodId": 1, "name": "Sector B" }
+  ],
+  "pollingStations": [
+    { "id": 1, "sectorId": 1, "name": "Escuela 12", "address": "Calle Falsa 123", "coords": { "lat": -34.60, "lng": -58.40 } }
+  ],
+  "voters": [
+    { "id": 1, "name": "Juan Pérez", "dni": "12345678", "pollingStationId": 1, "address": "Calle Falsa 123", "coords": { "lat": -34.6001, "lng": -58.4002 }, "score": 0.8 }
+  ],
+  "actions": [
+    { "id": 1, "title": "Visita puerta a puerta", "zoneId": 1, "assignedTo": 2, "status": "planned", "priority": "high" }
+  ],
+  "logs": [
+    { "id": 1, "actionId": 1, "userId": 2, "timestamp": "2026-02-17T10:00:00Z", "note": "Se visitaron 20 viviendas" }
+  ],
+  "metrics": {
+    "coverage": 0.12,
+    "contacts": 234,
+    "conversion": 0.05
+  },
+  "geojson_features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": { "id": 1, "name": "Sector A" },
+        "geometry": { "type": "Polygon", "coordinates": [[[ -58.401, -34.601 ], [ -58.399, -34.601 ], [ -58.399, -34.599 ], [ -58.401, -34.599 ], [ -58.401, -34.601 ]]] }
+      }
+    ]
+  }
+}
