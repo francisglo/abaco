@@ -1,50 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { fetchZones, fetchGeoJSON } from '../api'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import MapView from './MapView'
 import StatsCard from './StatsCard'
-import { useAuth } from '../context/AuthContext'
+import { fetchZones as fetchZonesThunk } from '../store/zonesSlice'
+import { fetchGeoJSON as fetchGeoThunk } from '../store/geoSlice'
 
 export default function Dashboard() {
-  const [zones, setZones] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [geojson, setGeojson] = useState(null)
-  const [geoLoading, setGeoLoading] = useState(false)
-  const [geoError, setGeoError] = useState(null)
+  const dispatch = useDispatch()
+  const { zones, loading: zonesLoading, error: zonesError } = useSelector(s => s.zones)
+  const { geojson, loading: geoLoading, error: geoError } = useSelector(s => s.geo)
+  const { user } = useSelector(s => s.auth)
 
   useEffect(() => {
-    let mounted = true
-    setLoading(true)
-    fetchZones()
-      .then(data => {
-        if (!mounted) return
-        setZones(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        if (!mounted) return
-        setError(err.message)
-        setLoading(false)
-      })
-    return () => { mounted = false }
-  }, [])
-
-  useEffect(() => {
-    let mounted = true
-    setGeoLoading(true)
-    fetchGeoJSON()
-      .then(data => {
-        if (!mounted) return
-        setGeojson(data)
-        setGeoLoading(false)
-      })
-      .catch(err => {
-        if (!mounted) return
-        setGeoError(err.message)
-        setGeoLoading(false)
-      })
-    return () => { mounted = false }
-  }, [])
+    if (!zones || zones.length === 0) dispatch(fetchZonesThunk())
+    if (!geojson) dispatch(fetchGeoThunk())
+  }, [dispatch])
 
   return (
     <section className="dashboard">
@@ -58,12 +28,12 @@ export default function Dashboard() {
       <div className="cards">
         <div className="card">
           <h3>Zonas</h3>
-          {loading && <p>Cargando zonas...</p>}
-          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-          {!loading && !error && (
+          {zonesLoading && <p>Cargando zonas...</p>}
+          {zonesError && <p style={{ color: 'red' }}>Error: {zonesError}</p>}
+          {!zonesLoading && !zonesError && (
             <ul>
-              {zones.length === 0 && <li>No hay zonas definidas.</li>}
-              {zones.map(z => (
+              {(!zones || zones.length === 0) && <li>No hay zonas definidas.</li>}
+              {zones && zones.map(z => (
                 <li key={z.id}>{z.name} (prioridad: {z.priority ?? '—'})</li>
               ))}
             </ul>

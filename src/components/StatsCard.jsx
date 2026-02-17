@@ -1,24 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { fetchMetrics } from '../api'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchMetrics } from '../store/metricsSlice'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function StatsCard() {
-  const [metrics, setMetrics] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch()
+  const { metrics, loading, error } = useSelector(s => s.metrics)
 
   useEffect(() => {
-    setLoading(true)
-    fetchMetrics()
-      .then(data => {
-        setMetrics(data)
-        setLoading(false)
-      })
-      .catch(err => { setError(err.message); setLoading(false) })
-  }, [])
+    if (!metrics) dispatch(fetchMetrics())
+  }, [dispatch])
 
   if (loading) return <div>Loading metrics...</div>
   if (error) return <div style={{ color: 'red' }}>Error: {error}</div>
