@@ -1,12 +1,48 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { fetchZones } from '../api'
 
 export default function Dashboard() {
+  const [zones, setZones] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let mounted = true
+    setLoading(true)
+    fetchZones()
+      .then(data => {
+        if (!mounted) return
+        setZones(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        if (!mounted) return
+        setError(err.message)
+        setLoading(false)
+      })
+    return () => { mounted = false }
+  }, [])
+
   return (
     <section className="dashboard">
       <h2>Dashboard</h2>
       <p>Visualizaciones, mapas y métricas aparecerán aquí.</p>
+
       <div className="cards">
-        <div className="card">Mapa (geo)</div>
+        <div className="card">
+          <h3>Zonas</h3>
+          {loading && <p>Cargando zonas...</p>}
+          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+          {!loading && !error && (
+            <ul>
+              {zones.length === 0 && <li>No hay zonas definidas.</li>}
+              {zones.map(z => (
+                <li key={z.id}>{z.name} (prioridad: {z.priority ?? '—'})</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <div className="card">Indicadores</div>
         <div className="card">Acciones prioritarias</div>
       </div>
