@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { fetchZones, fetchGeoJSON } from '../api'
 import MapView from './MapView'
+import StatsCard from './StatsCard'
+import { useAuth } from '../context/AuthContext'
 
 export default function Dashboard() {
   const [zones, setZones] = useState([])
@@ -49,6 +51,10 @@ export default function Dashboard() {
       <h2>Dashboard</h2>
       <p>Visualizaciones, mapas y métricas aparecerán aquí.</p>
 
+      {/* Role-based info */}
+      {/* eslint-disable-next-line react/jsx-pascal-case */}
+      {user && <p>Rol activo: <strong>{user.role}</strong></p>}
+
       <div className="cards">
         <div className="card">
           <h3>Zonas</h3>
@@ -64,7 +70,10 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card">Indicadores</div>
+        <div className="card">
+          <StatsCard />
+        </div>
+
         <div className="card">Acciones prioritarias</div>
       </div>
       <div style={{ marginTop: 16 }}>
@@ -73,6 +82,12 @@ export default function Dashboard() {
         {geoError && <p style={{ color: 'red' }}>Error: {geoError}</p>}
         {!geoLoading && geojson && <MapView geojson={geojson} />}
       </div>
+      {user && user.role === 'admin' && (
+        <div style={{ marginTop: 16 }} className="card">
+          <h3>Panel administrador</h3>
+          <p>Acciones sensibles y controles administrativos visibles solo para administradores.</p>
+        </div>
+      )}
     </section>
   )
 }
