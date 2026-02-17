@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { fetchZones } from '../api'
+import { fetchZones, fetchGeoJSON } from '../api'
+import MapView from './MapView'
 
 export default function Dashboard() {
   const [zones, setZones] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [geojson, setGeojson] = useState(null)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoError, setGeoError] = useState(null)
 
   useEffect(() => {
     let mounted = true
@@ -19,6 +23,23 @@ export default function Dashboard() {
         if (!mounted) return
         setError(err.message)
         setLoading(false)
+      })
+    return () => { mounted = false }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    setGeoLoading(true)
+    fetchGeoJSON()
+      .then(data => {
+        if (!mounted) return
+        setGeojson(data)
+        setGeoLoading(false)
+      })
+      .catch(err => {
+        if (!mounted) return
+        setGeoError(err.message)
+        setGeoLoading(false)
       })
     return () => { mounted = false }
   }, [])
@@ -45,6 +66,12 @@ export default function Dashboard() {
 
         <div className="card">Indicadores</div>
         <div className="card">Acciones prioritarias</div>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <h3>Mapa territorial</h3>
+        {geoLoading && <p>Cargando mapa...</p>}
+        {geoError && <p style={{ color: 'red' }}>Error: {geoError}</p>}
+        {!geoLoading && geojson && <MapView geojson={geojson} />}
       </div>
     </section>
   )
