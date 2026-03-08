@@ -30,13 +30,20 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = String(process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+const corsUseWildcard = allowedOrigins.length === 0 || allowedOrigins.includes('*');
+
 // ===== MIDDLEWARE DE SEGURIDAD =====
 app.use(helmet());
 
 // ===== CORS =====
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || '*',
-  credentials: true,
+  origin: corsUseWildcard ? true : allowedOrigins,
+  credentials: !corsUseWildcard,
   optionsSuccessStatus: 200
 }));
 

@@ -55,10 +55,41 @@ export function errorHandler(error, req, res, next) {
   }
 
   // Error de base de datos
-  if (error.code && error.detail) {
+  if (error.code) {
+    const code = String(error.code).toUpperCase();
+    const dbUnavailableCodes = new Set([
+      'ECONNREFUSED',
+      'ETIMEDOUT',
+      'ECONNRESET',
+      '57P01',
+      '57P02',
+      '57P03',
+      '53300'
+    ]);
+
+    if (dbUnavailableCodes.has(code)) {
+      return res.status(503).json({
+        error: 'Base de datos no disponible temporalmente',
+        code: 'DB_UNAVAILABLE',
+        errorId,
+        severityScore
+      });
+    }
+
+    if (code === '42P01') {
+      return res.status(500).json({
+        error: process.env.NODE_ENV === 'production'
+          ? 'Estructura de base de datos incompleta'
+          : (error.message || 'Relación no encontrada en base de datos'),
+        code: 'DB_SCHEMA_MISSING',
+        errorId,
+        severityScore
+      });
+    }
+
     return res.status(400).json({
       error: 'Error en base de datos',
-      code: error.code,
+      code,
       errorId,
       severityScore,
       message: error.detail || error.message

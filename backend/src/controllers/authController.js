@@ -96,12 +96,16 @@ export const login = asyncHandler(async (req, res) => {
   });
 
   // Registrar login
-  await database.insert('audit_logs', {
-    user_id: user.id,
-    action: 'LOGIN',
-    details: JSON.stringify({ ip: req.ip, userAgent: req.get('user-agent') }),
-    created_at: new Date()
-  });
+  try {
+    await database.insert('audit_logs', {
+      user_id: user.id,
+      action: 'LOGIN',
+      details: JSON.stringify({ ip: req.ip, userAgent: req.get('user-agent') }),
+      created_at: new Date()
+    });
+  } catch (auditError) {
+    console.warn('⚠️ No se pudo registrar auditoría de LOGIN:', auditError.message);
+  }
 
   res.json({
     message: 'Login exitoso',
@@ -177,11 +181,15 @@ export const changePassword = asyncHandler(async (req, res) => {
  */
 export const logout = asyncHandler(async (req, res) => {
   // Log de auditoría
-  await database.insert('audit_logs', {
-    user_id: req.user.id,
-    action: 'LOGOUT',
-    created_at: new Date()
-  });
+  try {
+    await database.insert('audit_logs', {
+      user_id: req.user.id,
+      action: 'LOGOUT',
+      created_at: new Date()
+    });
+  } catch (auditError) {
+    console.warn('⚠️ No se pudo registrar auditoría de LOGOUT:', auditError.message);
+  }
 
   res.json({
     message: 'Logout exitoso'
@@ -294,17 +302,21 @@ export const googleAuth = asyncHandler(async (req, res) => {
     role: user.role
   });
 
-  await database.insert('audit_logs', {
-    user_id: user.id,
-    action: 'GOOGLE_LOGIN',
-    details: JSON.stringify({
-      googleSub: googleData.sub,
-      email: googleData.email,
-      ip: req.ip,
-      userAgent: req.get('user-agent')
-    }),
-    created_at: new Date()
-  });
+  try {
+    await database.insert('audit_logs', {
+      user_id: user.id,
+      action: 'GOOGLE_LOGIN',
+      details: JSON.stringify({
+        googleSub: googleData.sub,
+        email: googleData.email,
+        ip: req.ip,
+        userAgent: req.get('user-agent')
+      }),
+      created_at: new Date()
+    });
+  } catch (auditError) {
+    console.warn('⚠️ No se pudo registrar auditoría de GOOGLE_LOGIN:', auditError.message);
+  }
 
   res.json({
     message: 'Login con Google exitoso',

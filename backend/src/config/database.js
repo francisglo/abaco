@@ -59,7 +59,6 @@ const pool = new Pool({
 // Manejar errores de conexión
 pool.on('error', (error) => {
   console.error('Error no esperado en el pool de conexiones:', error);
-  process.exit(-1);
 });
 
 /**

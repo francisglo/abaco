@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { getJwtExpiresIn, getJwtSecret } from '../config/runtime.js';
 
 dotenv.config();
 
@@ -30,9 +31,10 @@ export function authenticate(req, res, next) {
     }
 
     const token = authHeader.substring(7);
+    const jwtSecret = getJwtSecret();
     
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded; // Agregar usuario al request
       next();
     } catch (error) {
@@ -89,7 +91,8 @@ export function authorize(...allowedRoles) {
  * @returns {string} Token JWT
  */
 export function generateToken(payload, expiresIn = process.env.JWT_EXPIRES_IN) {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+  const jwtSecret = getJwtSecret();
+  return jwt.sign(payload, jwtSecret, { expiresIn: expiresIn || getJwtExpiresIn() });
 }
 
 /**
@@ -98,5 +101,5 @@ export function generateToken(payload, expiresIn = process.env.JWT_EXPIRES_IN) {
  * @returns {object} Token decodificado
  */
 export function verifyToken(token) {
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, getJwtSecret());
 }
