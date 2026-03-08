@@ -4,6 +4,13 @@ import crypto from 'crypto';
 import database from '../config/database.js';
 import { generateToken } from '../middleware/auth.js';
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
+import {
+  changeFallbackPassword,
+  getFallbackProfileById,
+  isDbUnavailableError,
+  loginFallbackUser,
+  registerFallbackUser
+} from '../services/authFallbackStore.js';
 
 /**
  * Controlador de autenticación
@@ -16,48 +23,73 @@ import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password, role = 'operator', phone, zoneId } = req.body;
 
-  // Verificar si usuario existe
-  const existing = await database.queryOne(
-    'SELECT id FROM users WHERE email = $1',
-    [email]
-  );
+  try {
+    // Verificar si usuario existe
+    const existing = await database.queryOne(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
 
-  if (existing) {
-    throw new AppError('Email ya registrado', 409, 'EMAIL_EXISTS');
-  }
+    if (existing) {
+      throw new AppError('Email ya registrado', 409, 'EMAIL_EXISTS');
+    }
 
-  // Hashear contraseña
-  const passwordHash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 10);
+    // Hashear contraseña
+    const passwordHash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 10);
 
-  // Insertar usuario
-  const user = await database.insert('users', {
-    name,
-    email,
-    password_hash: passwordHash,
-    role,
-    phone,
-    zone_id: zoneId,
-    active: true,
-    created_at: new Date()
-  });
+    // Insertar usuario
+    const user = await database.insert('users', {
+      name,
+      email,
+      password_hash: passwordHash,
+      role,
+      phone,
+      zone_id: zoneId,
+      active: true,
+      created_at: new Date()
+    });
 
-  // Generar token
-  const token = generateToken({
-    id: user.id,
-    email: user.email,
-    role: user.role
-  });
-
-  res.status(201).json({
-    message: 'Usuario registrado correctamente',
-    user: {
+    // Generar token
+    const token = generateToken({
       id: user.id,
-      name: user.name,
       email: user.email,
       role: user.role
-    },
-    token
-  });
+    });
+
+    return res.status(201).json({
+      message: 'Usuario registrado correctamente',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      token
+    });
+  } catch (error) {
+    if (!isDbUnavailableError(error)) {
+      throw error;
+    }
+
+    const fallbackUser = await registerFallbackUser({ name, email, password, role, phone, zoneId });
+    const token = generateToken({
+      id: fallbackUser.id,
+      email: fallbackUser.email,
+      role: fallbackUser.role
+    });
+
+    return res.status(201).json({
+      message: 'Usuario registrado correctamente',
+      mode: 'degraded',
+      user: {
+        id: fallbackUser.id,
+        name: fallbackUser.name,
+        email: fallbackUser.email,
+        role: fallbackUser.role
+      },
+      token
+    });
+  }
 });
 
 /**
@@ -67,56 +99,81 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Buscar usuario
-  const user = await database.queryOne(
-    'SELECT id, name, email, role, password_hash, active FROM users WHERE email = $1',
-    [email]
-  );
-
-  if (!user) {
-    throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
-  }
-
-  if (!user.active) {
-    throw new AppError('Usuario desactivado', 403, 'USER_INACTIVE');
-  }
-
-  // Verificar contraseña
-  const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-  if (!passwordMatch) {
-    throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
-  }
-
-  // Generar token
-  const token = generateToken({
-    id: user.id,
-    email: user.email,
-    role: user.role
-  });
-
-  // Registrar login
   try {
-    await database.insert('audit_logs', {
-      user_id: user.id,
-      action: 'LOGIN',
-      details: JSON.stringify({ ip: req.ip, userAgent: req.get('user-agent') }),
-      created_at: new Date()
-    });
-  } catch (auditError) {
-    console.warn('⚠️ No se pudo registrar auditoría de LOGIN:', auditError.message);
-  }
+    // Buscar usuario
+    const user = await database.queryOne(
+      'SELECT id, name, email, role, password_hash, active FROM users WHERE email = $1',
+      [email]
+    );
 
-  res.json({
-    message: 'Login exitoso',
-    user: {
+    if (!user) {
+      throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
+    }
+
+    if (!user.active) {
+      throw new AppError('Usuario desactivado', 403, 'USER_INACTIVE');
+    }
+
+    // Verificar contraseña
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
+    }
+
+    // Generar token
+    const token = generateToken({
       id: user.id,
-      name: user.name,
       email: user.email,
       role: user.role
-    },
-    token
-  });
+    });
+
+    // Registrar login
+    try {
+      await database.insert('audit_logs', {
+        user_id: user.id,
+        action: 'LOGIN',
+        details: JSON.stringify({ ip: req.ip, userAgent: req.get('user-agent') }),
+        created_at: new Date()
+      });
+    } catch (auditError) {
+      console.warn('⚠️ No se pudo registrar auditoría de LOGIN:', auditError.message);
+    }
+
+    return res.json({
+      message: 'Login exitoso',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      token
+    });
+  } catch (error) {
+    if (!isDbUnavailableError(error)) {
+      throw error;
+    }
+
+    const fallbackUser = await loginFallbackUser({ email, password });
+    const token = generateToken({
+      id: fallbackUser.id,
+      email: fallbackUser.email,
+      role: fallbackUser.role
+    });
+
+    return res.json({
+      message: 'Login exitoso',
+      mode: 'degraded',
+      user: {
+        id: fallbackUser.id,
+        name: fallbackUser.name,
+        email: fallbackUser.email,
+        role: fallbackUser.role
+      },
+      token
+    });
+  }
 });
 
 /**
@@ -124,18 +181,29 @@ export const login = asyncHandler(async (req, res) => {
  * GET /api/auth/me
  */
 export const getProfile = asyncHandler(async (req, res) => {
-  const user = await database.queryOne(
-    'SELECT id, name, email, role, phone, zone_id, active, created_at FROM users WHERE id = $1',
-    [req.user.id]
-  );
+  try {
+    const user = await database.queryOne(
+      'SELECT id, name, email, role, phone, zone_id, active, created_at FROM users WHERE id = $1',
+      [req.user.id]
+    );
 
-  if (!user) {
-    throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
+    if (!user) {
+      throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
+    }
+
+    return res.json({ user });
+  } catch (error) {
+    if (!isDbUnavailableError(error)) {
+      throw error;
+    }
+
+    const user = await getFallbackProfileById(req.user.id);
+    if (!user) {
+      throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
+    }
+
+    return res.json({ user, mode: 'degraded' });
   }
-
-  res.json({
-    user
-  });
 });
 
 /**
@@ -145,34 +213,43 @@ export const getProfile = asyncHandler(async (req, res) => {
 export const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
-  // Validar contraseña actual
-  const user = await database.queryOne(
-    'SELECT password_hash FROM users WHERE id = $1',
-    [req.user.id]
-  );
+  try {
+    // Validar contraseña actual
+    const user = await database.queryOne(
+      'SELECT password_hash FROM users WHERE id = $1',
+      [req.user.id]
+    );
 
-  const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+    const isValid = await bcrypt.compare(currentPassword, user.password_hash);
 
-  if (!isValid) {
-    throw new AppError('Contraseña actual incorrecta', 401, 'INVALID_PASSWORD');
+    if (!isValid) {
+      throw new AppError('Contraseña actual incorrecta', 401, 'INVALID_PASSWORD');
+    }
+
+    // Hashear nueva contraseña
+    const newHash = await bcrypt.hash(newPassword, parseInt(process.env.BCRYPT_ROUNDS) || 10);
+
+    // Actualizar
+    await database.update('users', { password_hash: newHash }, { id: req.user.id });
+
+    // Log de auditoría
+    await database.insert('audit_logs', {
+      user_id: req.user.id,
+      action: 'CHANGE_PASSWORD',
+      created_at: new Date()
+    });
+
+    return res.json({
+      message: 'Contraseña actualizada correctamente'
+    });
+  } catch (error) {
+    if (!isDbUnavailableError(error)) {
+      throw error;
+    }
+
+    await changeFallbackPassword({ userId: req.user.id, currentPassword, newPassword });
+    return res.json({ message: 'Contraseña actualizada correctamente', mode: 'degraded' });
   }
-
-  // Hashear nueva contraseña
-  const newHash = await bcrypt.hash(newPassword, parseInt(process.env.BCRYPT_ROUNDS) || 10);
-
-  // Actualizar
-  await database.update('users', { password_hash: newHash }, { id: req.user.id });
-
-  // Log de auditoría
-  await database.insert('audit_logs', {
-    user_id: req.user.id,
-    action: 'CHANGE_PASSWORD',
-    created_at: new Date()
-  });
-
-  res.json({
-    message: 'Contraseña actualizada correctamente'
-  });
 });
 
 /**
