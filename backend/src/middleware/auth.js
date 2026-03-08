@@ -92,7 +92,8 @@ export function authorize(...allowedRoles) {
  */
 export function generateToken(payload, expiresIn = process.env.JWT_EXPIRES_IN) {
   const jwtSecret = getJwtSecret();
-  return jwt.sign(payload, jwtSecret, { expiresIn: expiresIn || getJwtExpiresIn() });
+  const normalizedExpiresIn = String(expiresIn || '').trim() || getJwtExpiresIn();
+  return jwt.sign(payload, jwtSecret, { expiresIn: normalizedExpiresIn });
 }
 
 /**
