@@ -14,7 +14,15 @@ const LOCAL_TOKEN_PREFIX = 'local:'
 
 function isNetworkAuthError(error) {
   const msg = String(error?.message || '').toLowerCase()
-  return msg.includes('no se pudo conectar') || msg.includes('failed to fetch') || msg.includes('networkerror')
+  return (
+    msg.includes('no se pudo conectar') ||
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('failed to login: 5') ||
+    msg.includes('failed to register: 5') ||
+    msg.includes('error interno') ||
+    msg.includes('internal_error')
+  )
 }
 
 function readLocalUsers() {
