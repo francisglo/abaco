@@ -3,7 +3,7 @@ import { AppError } from '../middleware/errorHandler.js';
 const DEV_FALLBACK_SECRET = 'abaco-dev-insecure-secret-change-me-2026';
 
 function isProduction() {
-  return String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+  return String(process.env.NODE_ENV || '').trim().toLowerCase() === 'production';
 }
 
 export function getJwtSecret() {

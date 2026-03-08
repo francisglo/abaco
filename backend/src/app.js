@@ -29,6 +29,7 @@ import { requestLogger } from './middleware/logging.js';
 dotenv.config();
 
 const app = express();
+const NODE_ENV = String(process.env.NODE_ENV || '').trim().toLowerCase();
 
 const allowedOrigins = String(process.env.CORS_ORIGIN || '')
   .split(',')
@@ -53,7 +54,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(compression());
 
 // ===== LOGGING =====
-const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+const morganFormat = NODE_ENV === 'production' ? 'combined' : 'dev';
 app.use(morgan(morganFormat));
 app.use(requestLogger);
 

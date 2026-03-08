@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const NODE_ENV = String(process.env.NODE_ENV || '').trim().toLowerCase();
+
 const TRANSIENT_ERROR_CODES = new Set([
   '40001',
   '40P01',
@@ -53,7 +55,7 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
   // SSL en producción
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 // Manejar errores de conexión
