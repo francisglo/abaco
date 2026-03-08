@@ -5,6 +5,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const NODE_ENV = String(process.env.NODE_ENV || '').trim().toLowerCase();
+const DB_CONNECTION_STRING = String(process.env.DATABASE_URL || process.env.POSTGRES_URL || '').trim();
+const DB_HOST = String(process.env.DB_HOST || process.env.PGHOST || 'localhost').trim();
+const DB_PORT = Number(String(process.env.DB_PORT || process.env.PGPORT || '5432').trim()) || 5432;
+const DB_NAME = String(process.env.DB_NAME || process.env.PGDATABASE || 'abaco_db').trim();
+const DB_USER = String(process.env.DB_USER || process.env.PGUSER || 'abaco_user').trim();
+const DB_PASSWORD = String(process.env.DB_PASSWORD || process.env.PGPASSWORD || 'password').trim();
 
 const TRANSIENT_ERROR_CODES = new Set([
   '40001',
@@ -45,18 +51,29 @@ function computeBackoffMs(attempt) {
  * Pool de conexiones a PostgreSQL
  * Gestiona conexiones reutilizables para mejor rendimiento
  */
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'abaco_db',
-  user: process.env.DB_USER || 'abaco_user',
-  password: process.env.DB_PASSWORD || 'password',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-  // SSL en producción
-  ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+const sslConfig = NODE_ENV === 'production' ? { rejectUnauthorized: false } : false;
+
+const pool = new Pool(
+  DB_CONNECTION_STRING
+    ? {
+        connectionString: DB_CONNECTION_STRING,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 8000,
+        ssl: sslConfig
+      }
+    : {
+        host: DB_HOST,
+        port: DB_PORT,
+        database: DB_NAME,
+        user: DB_USER,
+        password: DB_PASSWORD,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 8000,
+        ssl: sslConfig
+      }
+);
 
 // Manejar errores de conexión
 pool.on('error', (error) => {
