@@ -1,0 +1,394 @@
+{
+  "verticals": [
+    { "id": 1, "name": "Electoral", "icon": "🗳️", "active": true },
+    { "id": 2, "name": "Gobierno / Gestión Pública", "icon": "🏛️", "active": true },
+    { "id": 3, "name": "Empresarial", "icon": "🏢", "active": false },
+    { "id": 4, "name": "ONG / Impacto Social", "icon": "🌎", "active": false }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin Local",
+      "email": "admin@abaco.local",
+      "role": "admin",
+      "territoryId": 1,
+      "phone": "555-0101",
+      "active": true,
+      "verticalId": 1
+    },
+    {
+      "id": 2,
+      "name": "Operador1",
+      "email": "opr1@abaco.local",
+      "role": "operator",
+      "territoryId": 2,
+      "phone": "555-0102",
+      "active": true,
+      "verticalId": 1
+    },
+    {
+      "id": 3,
+      "name": "Operador2",
+      "email": "opr2@abaco.local",
+      "role": "operator",
+      "territoryId": 3,
+      "phone": "555-0103",
+      "active": true,
+      "verticalId": 2
+    },
+    {
+      "id": 4,
+      "name": "Auditor",
+      "email": "auditor@abaco.local",
+      "role": "auditor",
+      "territoryId": null,
+      "phone": "555-0199",
+      "active": true,
+      "verticalId": null
+    }
+  ],
+  "territories": [
+    {
+      "id": 1,
+      "name": "Región Norte",
+      "type": "region",
+      "priority": 1,
+      "parentId": null
+    },
+    {
+      "id": 2,
+      "name": "Región Sur",
+      "type": "region",
+      "priority": 2,
+      "parentId": null
+    },
+    {
+      "id": 3,
+      "name": "Comuna 1 - Popular",
+      "type": "district",
+      "priority": 1,
+      "parentId": 1
+    },
+    {
+      "id": 4,
+      "name": "Comuna 2 - Santa Cruz",
+      "type": "district",
+      "priority": 2,
+      "parentId": 1
+    }
+  ],
+  "subTerritories": [
+    {
+      "id": 1,
+      "territoryId": 1,
+      "type": "neighborhood",
+      "name": "Barrio Centro"
+    },
+    {
+      "id": 2,
+      "territoryId": 1,
+      "type": "neighborhood",
+      "name": "Barrio Alto"
+    },
+    {
+      "id": 3,
+      "territoryId": 2,
+      "type": "neighborhood",
+      "name": "Barrio Costa"
+    },
+    {
+      "id": 4,
+      "territoryId": 1,
+      "type": "sector",
+      "name": "Sector A",
+      "parentId": 1
+    },
+    {
+      "id": 5,
+      "territoryId": 1,
+      "type": "sector",
+      "name": "Sector B",
+      "parentId": 1
+    },
+    {
+      "id": 6,
+      "territoryId": 1,
+      "type": "location",
+      "name": "Escuela 12",
+      "address": "Calle Falsa 123",
+      "coords": {
+        "lat": -34.6,
+        "lng": -58.4
+      }
+    }
+  ],
+  "contacts": [
+    {
+      "id": 1,
+      "verticalId": 1,
+      "territoryId": 1,
+      "name": "Juan Pérez",
+      "documentType": "DNI",
+      "documentNumber": "12345678",
+      "address": "Calle Falsa 123",
+      "coords": {
+        "lat": -34.6001,
+        "lng": -58.4002
+      },
+      "phone": "555-0001",
+      "email": "juan.perez@example.com",
+      "birthdate": "1980-05-12",
+      "gender": "M",
+      "tags": ["lider_barrial", "adulto_mayor"],
+      "segment": "high_engagement",
+      "priority": "high",
+      "status": "pending",
+      "score": 0.8,
+      "registeredBy": 2,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-02-17T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "verticalId": 1,
+      "territoryId": 1,
+      "name": "María Gómez",
+      "documentType": "DNI",
+      "documentNumber": "87654321",
+      "address": "Av. Siempreviva 50",
+      "coords": {
+        "lat": -34.601,
+        "lng": -58.402
+      },
+      "phone": "555-0002",
+      "email": "maria.gomez@example.com",
+      "birthdate": "1990-08-01",
+      "gender": "F",
+      "tags": ["joven", "universitaria"],
+      "segment": "moderate_engagement",
+      "priority": "medium",
+      "status": "confirmed",
+      "score": 0.6,
+      "registeredBy": 2,
+      "createdAt": "2026-01-20T14:00:00Z",
+      "updatedAt": "2026-02-17T12:00:00Z"
+    },
+    {
+      "id": 3,
+      "verticalId": 2,
+      "territoryId": 3,
+      "name": "Carlos Rodríguez",
+      "documentType": "DNI",
+      "documentNumber": "23456789",
+      "address": "Calle Principal 456",
+      "coords": {
+        "lat": -34.602,
+        "lng": -58.403
+      },
+      "phone": "555-0003",
+      "email": "carlos.r@example.com",
+      "birthdate": "1985-03-15",
+      "gender": "M",
+      "tags": ["comerciante", "emprendedor"],
+      "segment": "stakeholder",
+      "priority": "high",
+      "status": "active",
+      "score": 0.9,
+      "registeredBy": 1,
+      "createdAt": "2026-02-01T09:00:00Z",
+      "updatedAt": "2026-02-17T15:00:00Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": 1,
+      "verticalId": 1,
+      "territoryId": 1,
+      "title": "Visita puerta a puerta",
+      "type": "field_work",
+      "assignedTo": 2,
+      "status": "planned",
+      "priority": "high",
+      "startDate": "2026-02-20T09:00:00Z",
+      "endDate": "2026-02-20T18:00:00Z"
+    },
+    {
+      "id": 2,
+      "verticalId": 2,
+      "territoryId": 3,
+      "title": "Reunión con líderes comunitarios",
+      "type": "meeting",
+      "assignedTo": 1,
+      "status": "completed",
+      "priority": "high",
+      "startDate": "2026-02-15T10:00:00Z",
+      "endDate": "2026-02-15T12:00:00Z"
+    }
+  ],
+  "interactions": [
+    {
+      "id": 1,
+      "activityId": 1,
+      "userId": 2,
+      "contactId": 1,
+      "verticalId": 1,
+      "timestamp": "2026-02-17T10:00:00Z",
+      "type": "visit",
+      "channel": "door_to_door",
+      "result": "no_answer",
+      "notes": "Visitó pero no estaba en casa. Volveremos mañana.",
+      "sentiment": "neutral",
+      "followUp": true
+    },
+    {
+      "id": 2,
+      "activityId": null,
+      "userId": 2,
+      "contactId": 2,
+      "verticalId": 1,
+      "timestamp": "2026-02-17T12:00:00Z",
+      "type": "contact",
+      "channel": "phone",
+      "result": "confirmed",
+      "notes": "Contacto telefónico exitoso. Confirmó asistencia al evento.",
+      "sentiment": "positive",
+      "followUp": false
+    },
+    {
+      "id": 3,
+      "activityId": 2,
+      "userId": 1,
+      "contactId": 3,
+      "verticalId": 2,
+      "timestamp": "2026-02-15T11:00:00Z",
+      "type": "meeting",
+      "channel": "in_person",
+      "result": "successful",
+      "notes": "Reunión productiva. Acuerdo de colaboración firmado.",
+      "sentiment": "very_positive",
+      "followUp": true
+    }
+  ],
+  "metrics": {
+    "coverage": 0.12,
+    "contacts": 234,
+    "conversion": 0.05
+  },
+  "geojson_features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "id": 1,
+          "name": "Sector A"
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -58.401,
+                -34.601
+              ],
+              [
+                -58.399,
+                -34.601
+              ],
+              [
+                -58.399,
+                -34.599
+              ],
+              [
+                -58.401,
+                -34.599
+              ],
+              [
+                -58.401,
+                -34.601
+              ]
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Visitar Zona Norte",
+      "description": "Realizar recorrido y registrar nuevos contactos",
+      "assignedTo": 1,
+      "territoryId": 1,
+      "status": "pending",
+      "priority": "high",
+      "dueDate": "2024-01-25",
+      "completed": false,
+      "createdAt": "2024-01-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Encuesta de Satisfacción",
+      "description": "Aplicar encuesta a contactos del territorio asignado",
+      "assignedTo": 2,
+      "territoryId": 2,
+      "status": "in_progress",
+      "priority": "medium",
+      "dueDate": "2024-01-28",
+      "completed": false,
+      "createdAt": "2024-01-21T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Actualizar Base de Datos",
+      "description": "Verificar y actualizar información de contactos inactivos",
+      "assignedTo": 3,
+      "territoryId": 3,
+      "status": "completed",
+      "priority": "low",
+      "dueDate": "2024-01-22",
+      "completed": true,
+      "createdAt": "2024-01-18T09:15:00Z",
+      "completedAt": "2024-01-22T16:45:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "userId": 1,
+      "type": "success",
+      "title": "Nuevo contacto registrado",
+      "message": "Se registró exitosamente a María García en Zona Norte",
+      "read": false,
+      "createdAt": "2024-01-23T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "type": "warning",
+      "title": "Tarea próxima a vencer",
+      "message": "La tarea 'Visitar Zona Norte' vence en 2 días",
+      "read": false,
+      "createdAt": "2024-01-23T09:00:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 2,
+      "type": "info",
+      "title": "Nueva encuesta disponible",
+      "message": "Se ha creado una nueva encuesta de satisfacción",
+      "read": true,
+      "createdAt": "2024-01-22T15:20:00Z"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "type": "error",
+      "title": "Error al sincronizar",
+      "message": "No se pudo sincronizar con el servidor externo",
+      "read": false,
+      "createdAt": "2024-01-23T08:45:00Z"
+    }
+  ]
+}
+```

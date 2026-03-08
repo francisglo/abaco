@@ -1,0 +1,35 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_24-5967859c100dcd96a9a9a924607911b2c666f203",
+  "solcVersion": "0.8.24",
+  "solcLongVersion": "0.8.24+commit.e11b9ed9",
+  "userSourceNameMap": {
+    "contracts/LedgerAnchor.sol": "project/contracts/LedgerAnchor.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/LedgerAnchor.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\ncontract LedgerAnchor {\r\n    struct AnchorRecord {\r\n        bytes32 rootHash;\r\n        uint256 blockIndex;\r\n        uint256 anchoredAt;\r\n        string source;\r\n    }\r\n\r\n    AnchorRecord[] private anchors;\r\n\r\n    event AnchorStored(\r\n        uint256 indexed anchorId,\r\n        bytes32 indexed rootHash,\r\n        uint256 indexed blockIndex,\r\n        string source,\r\n        uint256 anchoredAt\r\n    );\r\n\r\n    function anchorRoot(bytes32 rootHash, uint256 blockIndex, string calldata source)\r\n        external\r\n        returns (uint256 anchorId)\r\n    {\r\n        require(rootHash != bytes32(0), \"rootHash required\");\r\n        require(bytes(source).length > 0, \"source required\");\r\n\r\n        anchors.push(\r\n            AnchorRecord({\r\n                rootHash: rootHash,\r\n                blockIndex: blockIndex,\r\n                anchoredAt: block.timestamp,\r\n                source: source\r\n            })\r\n        );\r\n\r\n        anchorId = anchors.length - 1;\r\n        emit AnchorStored(anchorId, rootHash, blockIndex, source, block.timestamp);\r\n    }\r\n\r\n    function totalAnchors() external view returns (uint256) {\r\n        return anchors.length;\r\n    }\r\n\r\n    function getAnchor(uint256 anchorId)\r\n        external\r\n        view\r\n        returns (bytes32 rootHash, uint256 blockIndex, uint256 anchoredAt, string memory source)\r\n    {\r\n        require(anchorId < anchors.length, \"anchor not found\");\r\n        AnchorRecord storage item = anchors[anchorId];\r\n        return (item.rootHash, item.blockIndex, item.anchoredAt, item.source);\r\n    }\r\n\r\n    function getLatestAnchor()\r\n        external\r\n        view\r\n        returns (bytes32 rootHash, uint256 blockIndex, uint256 anchoredAt, string memory source)\r\n    {\r\n        require(anchors.length > 0, \"no anchors\");\r\n        AnchorRecord storage item = anchors[anchors.length - 1];\r\n        return (item.rootHash, item.blockIndex, item.anchoredAt, item.source);\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

@@ -1,45 +1,893 @@
 {
+  "verticals": [
+    {
+      "id": 1,
+      "name": "Electoral",
+      "icon": "🗳️",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Gobierno / Gestión Pública",
+      "icon": "🏛️",
+      "active": true
+    }
+  ],
   "users": [
-    { "id": 1, "name": "Admin Local", "email": "admin@abaco.local", "role": "admin" },
-    { "id": 2, "name": "Operador Campo", "email": "field@abaco.local", "role": "operator" }
+    {
+      "id": 1,
+      "name": "Admin Local",
+      "email": "admin@abaco.local",
+      "role": "admin",
+      "phone": "555-0101",
+      "active": true,
+      "zoneId": 1,
+      "passwordHash": "$2a$10$SM.DzBxEWDc2/o4UpMUsTuBrZZcLgW38UEFnoGjxarbO3.fphDcz."
+    },
+    {
+      "id": 2,
+      "name": "Operador Norte",
+      "email": "op.norte@abaco.local",
+      "role": "operator",
+      "phone": "555-0102",
+      "active": true,
+      "zoneId": 1
+    },
+    {
+      "id": 3,
+      "name": "Auditor General",
+      "email": "auditor@abaco.local",
+      "role": "auditor",
+      "phone": "555-0103",
+      "active": true,
+      "zoneId": 2
+    },
+    {
+      "id": 4,
+      "name": "Viewer Regional",
+      "email": "viewer@abaco.local",
+      "role": "viewer",
+      "phone": "555-0104",
+      "active": false,
+      "zoneId": 3
+    },
+    {
+      "id": 5,
+      "name": "Nuevo Usuario",
+      "email": "nuevo.1771974577@abaco.local",
+      "role": "operator",
+      "phone": "300100200",
+      "active": true,
+      "zoneId": null,
+      "passwordHash": "$2a$10$b4D/domeqZmkZ6sILKqbxO9YW1EYlLylPKN3T.bLLWtJEb5UgqJ5."
+    },
+    {
+      "id": 6,
+      "name": "Usuario Cifrado",
+      "email": "cifrado.1771974768@abaco.local",
+      "role": "operator",
+      "phone": "399000111",
+      "active": true,
+      "zoneId": null,
+      "encryptedProfile": {
+        "iv": "qiC1wDHZSWcdovqe",
+        "tag": "dlFa4bo5DdiZ9UAFy4NadQ==",
+        "data": "Y+ZuqVOMNw87Sk+zIHrXwbIjywFuZsU/1zvZPHyHKlY7NWAsxm2IsZ13Lvl80YEMD1leBF+EVUlprb7gEwMTgtc3Ng4FUQ2BDq0VLC7ANeA="
+      },
+      "passwordHash": "$2a$10$o2dVPI4xSk1zwORfo9z3wOhNwg/YIn.4V9yw1Cm/ubS9ftrdRIvce"
+    },
+    {
+      "id": 7,
+      "name": "Francisco",
+      "email": "Franciscogloopez@gmail.com",
+      "role": "operator",
+      "phone": "3213495169",
+      "active": true,
+      "zoneId": null,
+      "encryptedProfile": {
+        "iv": "HvtLPSvpl5ttcnzM",
+        "tag": "HH1TpmOVjMbG4TBwwo9zPw==",
+        "data": "PRca1Ipw0EGSP25HV0jyDbnENXJYuxPkA7dRnHksXsppFhlpJQKnJW6q6mDKjM5u0SnkN3I++Q3tcO2rgpK5K7O0E1BIbO5TaFFCH9w2gNnPGKJnLGdUSkA1fcait/i8rvj3VrMu6IRq3Rv4CZwGEDrdu+ZD7wyf47SoIZPp8oFreUDUOWvAKboqqk0NCfks55WQH6rKhyIA4dwq"
+      },
+      "passwordHash": "$2a$10$43rVH7kmU7EYyfrRFXVK8esteS5Ki5wKM6PoXplmFPUaTX6hm.6J2"
+    },
+    {
+      "id": 8,
+      "name": "Acceso Temporal",
+      "email": "temporal@abaco.local",
+      "role": "operator",
+      "phone": "555-0199",
+      "active": true,
+      "zoneId": 1,
+      "passwordHash": "$2a$10$Ld2uV2CgoC1vkmWY6/jb1uWSnhRSUZCuyPj1aZxucJg6AtUTgkJ8O"
+    }
   ],
   "zones": [
-    { "id": 1, "name": "Zona Norte", "priority": 1 },
-    { "id": 2, "name": "Zona Sur", "priority": 2 }
-  ],
-  "neighborhoods": [
-    { "id": 1, "zoneId": 1, "name": "Barrio Centro" },
-    { "id": 2, "zoneId": 1, "name": "Barrio Alto" },
-    { "id": 3, "zoneId": 2, "name": "Barrio Costa" }
-  ],
-  "sectors": [
-    { "id": 1, "neighborhoodId": 1, "name": "Sector A" },
-    { "id": 2, "neighborhoodId": 1, "name": "Sector B" }
-  ],
-  "pollingStations": [
-    { "id": 1, "sectorId": 1, "name": "Escuela 12", "address": "Calle Falsa 123", "coords": { "lat": -34.60, "lng": -58.40 } }
+    {
+      "id": 1,
+      "name": "Zona Norte",
+      "priority": 1,
+      "manager": "Operador Norte",
+      "description": "Territorio norte con mayor densidad poblacional"
+    },
+    {
+      "id": 2,
+      "name": "Zona Centro",
+      "priority": 2,
+      "manager": "Admin Local",
+      "description": "Área central del municipio"
+    },
+    {
+      "id": 3,
+      "name": "Zona Sur",
+      "priority": 3,
+      "manager": "Operador Sur",
+      "description": "Territorio sur con cobertura en expansión"
+    }
   ],
   "voters": [
-    { "id": 1, "name": "Juan Pérez", "dni": "12345678", "pollingStationId": 1, "address": "Calle Falsa 123", "coords": { "lat": -34.6001, "lng": -58.4002 }, "score": 0.8 }
+    {
+      "id": 1,
+      "name": "Juan Pérez",
+      "dni": "12345678",
+      "phone": "555-0001",
+      "email": "juan@example.com",
+      "status": "pending",
+      "priority": "high",
+      "address": "Calle 1, 100",
+      "lat": -34.6,
+      "lng": -58.4,
+      "encrypted": true
+    },
+    {
+      "id": 2,
+      "name": "María Gómez",
+      "dni": "23456789",
+      "phone": "555-0002",
+      "email": "maria@example.com",
+      "status": "confirmed",
+      "priority": "medium",
+      "address": "Calle 2, 200",
+      "lat": -34.61,
+      "lng": -58.41,
+      "encrypted": true
+    },
+    {
+      "id": 3,
+      "name": "Carlos Ruiz",
+      "dni": "34567890",
+      "phone": "555-0003",
+      "email": "carlos@example.com",
+      "status": "active",
+      "priority": "low",
+      "address": "Calle 3, 300",
+      "lat": -34.62,
+      "lng": -58.42,
+      "encrypted": true
+    },
+    {
+      "id": 4,
+      "name": "Ana López",
+      "dni": "45678901",
+      "phone": "555-0004",
+      "email": "ana@example.com",
+      "status": "confirmed",
+      "priority": "high",
+      "address": "Avenida 4, 400",
+      "lat": -34.605,
+      "lng": -58.395,
+      "encrypted": true
+    },
+    {
+      "id": 5,
+      "name": "Roberto Fernández",
+      "dni": "56789012",
+      "phone": "555-0005",
+      "email": "roberto@example.com",
+      "status": "pending",
+      "priority": "medium",
+      "address": "Calle 5, 500",
+      "lat": -34.615,
+      "lng": -58.405,
+      "encrypted": true
+    },
+    {
+      "id": 6,
+      "name": "Patricia Martínez",
+      "dni": "67890123",
+      "phone": "555-0006",
+      "email": "patricia@example.com",
+      "status": "active",
+      "priority": "low",
+      "address": "Calle 6, 600",
+      "lat": -34.625,
+      "lng": -58.415,
+      "encrypted": false
+    },
+    {
+      "id": 7,
+      "name": "Luis García",
+      "dni": "78901234",
+      "phone": "555-0007",
+      "email": "luis@example.com",
+      "status": "confirmed",
+      "priority": "high",
+      "address": "Calle 7, 700",
+      "lat": -34.635,
+      "lng": -58.425,
+      "encrypted": false
+    },
+    {
+      "id": 8,
+      "name": "Sofía Rodríguez",
+      "dni": "89012345",
+      "phone": "555-0008",
+      "email": "sofia@example.com",
+      "status": "active",
+      "priority": "medium",
+      "address": "Calle 8, 800",
+      "lat": -34.645,
+      "lng": -58.435,
+      "encrypted": true
+    },
+    {
+      "id": 9,
+      "name": "Fernando Díaz",
+      "dni": "90123456",
+      "phone": "555-0009",
+      "email": "fernando@example.com",
+      "status": "pending",
+      "priority": "low",
+      "address": "Calle 9, 900",
+      "lat": -34.595,
+      "lng": -58.385,
+      "encrypted": false
+    },
+    {
+      "id": 10,
+      "name": "Isabel Cruz",
+      "dni": "01234567",
+      "phone": "555-0010",
+      "email": "isabel@example.com",
+      "status": "confirmed",
+      "priority": "high",
+      "address": "Calle 10, 1000",
+      "lat": -34.585,
+      "lng": -58.375,
+      "encrypted": true
+    }
   ],
-  "actions": [
-    { "id": 1, "title": "Visita puerta a puerta", "zoneId": 1, "assignedTo": 2, "status": "planned", "priority": "high" }
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Visitar Zona Norte",
+      "description": "Recorrido puerta a puerta",
+      "assignedTo": 2,
+      "status": "pending",
+      "priority": "high",
+      "dueDate": "2026-02-20",
+      "completed": false,
+      "type": "field_work",
+      "createdAt": "2026-02-17T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Reunión comunitaria",
+      "description": "Encuentro con líderes barriales",
+      "assignedTo": 1,
+      "status": "in_progress",
+      "priority": "medium",
+      "dueDate": "2026-02-21",
+      "completed": false,
+      "type": "meeting",
+      "createdAt": "2026-02-17T10:15:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Actualizar base de contactos",
+      "description": "Validar teléfonos y estado",
+      "assignedTo": 3,
+      "status": "completed",
+      "priority": "low",
+      "dueDate": "2026-02-18",
+      "completed": true,
+      "type": "data",
+      "createdAt": "2026-02-16T11:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Validación de datos",
+      "description": "Verificar integridad de información",
+      "assignedTo": 1,
+      "status": "pending",
+      "priority": "high",
+      "dueDate": "2026-02-25",
+      "completed": false,
+      "type": "data",
+      "createdAt": "2026-02-18T09:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Exportar reportes",
+      "description": "Generar reportes mensuales",
+      "assignedTo": 2,
+      "status": "in_progress",
+      "priority": "medium",
+      "dueDate": "2026-02-22",
+      "completed": false,
+      "type": "data",
+      "createdAt": "2026-02-18T10:30:00Z"
+    },
+    {
+      "priority": "medium",
+      "title": "Tarea API propia",
+      "description": "Creada desde custom API",
+      "completed": false,
+      "status": "pending",
+      "id": 6
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "userId": 1,
+      "type": "success",
+      "title": "Bienvenido",
+      "message": "Sistema iniciado",
+      "read": false,
+      "createdAt": "2026-02-17T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "type": "info",
+      "title": "Nueva tarea",
+      "message": "Se asignó una tarea a tu cuenta",
+      "read": false,
+      "createdAt": "2026-02-18T09:00:00Z"
+    }
   ],
   "logs": [
-    { "id": 1, "actionId": 1, "userId": 2, "timestamp": "2026-02-17T10:00:00Z", "note": "Se visitaron 20 viviendas" }
+    {
+      "id": 1,
+      "timestamp": "2026-02-17T09:30:00Z",
+      "userId": 2,
+      "voterId": 1,
+      "type": "contact",
+      "result": "pending",
+      "notes": "No estaba en domicilio"
+    },
+    {
+      "id": 2,
+      "timestamp": "2026-02-17T10:10:00Z",
+      "userId": 2,
+      "voterId": 2,
+      "type": "contact",
+      "result": "confirmed",
+      "notes": "Confirmó participación"
+    },
+    {
+      "id": 3,
+      "timestamp": "2026-02-17T11:25:00Z",
+      "userId": 1,
+      "voterId": 3,
+      "type": "visit",
+      "result": "active",
+      "notes": "Contacto exitoso"
+    },
+    {
+      "id": 4,
+      "timestamp": "2026-02-18T08:00:00Z",
+      "userId": 2,
+      "voterId": 4,
+      "type": "contact",
+      "result": "confirmed",
+      "notes": "Interesada en participar"
+    },
+    {
+      "id": 5,
+      "timestamp": "2026-02-18T09:30:00Z",
+      "userId": 1,
+      "voterId": 5,
+      "type": "data",
+      "result": "pending",
+      "notes": "Datos actualizados"
+    }
   ],
   "metrics": {
-    "coverage": 0.12,
-    "contacts": 234,
-    "conversion": 0.05
+    "totalContacts": 3250,
+    "confirmed": 1860,
+    "pending": 970,
+    "coverage": 67.4,
+    "engagement": 74.2,
+    "tasksOpen": 2,
+    "dataIntegrity": 94.8,
+    "syncStatus": "synchronized"
   },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Votantes Regulares",
+      "description": "Contactos que participan regularmente"
+    },
+    {
+      "id": 2,
+      "name": "Nuevos Contactos",
+      "description": "Recientemente agregados a la base de datos"
+    },
+    {
+      "id": 3,
+      "name": "Inactivos",
+      "description": "No han tenido interacción reciente"
+    },
+    {
+      "id": 4,
+      "name": "Líderes Comunitarios",
+      "description": "Referentes territoriales"
+    }
+  ],
+  "variables": [
+    {
+      "id": 1,
+      "name": "Intención de voto",
+      "category": "Electoral",
+      "type": "percentage",
+      "dataType": "numeric"
+    },
+    {
+      "id": 2,
+      "name": "Zona de residencia",
+      "category": "Territorial",
+      "type": "categorical",
+      "dataType": "text"
+    },
+    {
+      "id": 3,
+      "name": "Teléfono de contacto",
+      "category": "Contacto",
+      "type": "text",
+      "dataType": "string"
+    },
+    {
+      "id": 4,
+      "name": "Estado de confirmación",
+      "category": "Electoral",
+      "type": "categorical",
+      "dataType": "select"
+    }
+  ],
+  "validationRules": [
+    {
+      "id": 1,
+      "field": "dni",
+      "rule": "required|numeric|length:8,10",
+      "message": "DNI debe tener entre 8 y 10 caracteres numéricos"
+    },
+    {
+      "id": 2,
+      "field": "phone",
+      "rule": "required|phone",
+      "message": "Teléfono inválido"
+    },
+    {
+      "id": 3,
+      "field": "email",
+      "rule": "email",
+      "message": "Email inválido"
+    },
+    {
+      "id": 4,
+      "field": "status",
+      "rule": "in:pending,confirmed,active,inactive",
+      "message": "Estado no válido"
+    }
+  ],
+  "accessLogs": [
+    {
+      "id": 1,
+      "username": "Admin Local",
+      "type": "login",
+      "ip": "192.168.1.100",
+      "timestamp": "2026-02-24T08:00:00Z",
+      "status": "success"
+    },
+    {
+      "id": 2,
+      "username": "Operador Norte",
+      "type": "login",
+      "ip": "192.168.1.101",
+      "timestamp": "2026-02-24T08:15:00Z",
+      "status": "success"
+    },
+    {
+      "id": 3,
+      "username": "unknown_user",
+      "type": "failed",
+      "ip": "192.168.1.200",
+      "timestamp": "2026-02-24T08:20:00Z",
+      "status": "failed",
+      "reason": "Contraseña incorrecta"
+    },
+    {
+      "id": 4,
+      "username": "Auditor General",
+      "type": "login",
+      "ip": "192.168.1.102",
+      "timestamp": "2026-02-24T09:00:00Z",
+      "status": "success"
+    },
+    {
+      "id": 5,
+      "username": "unknown_user",
+      "type": "blocked",
+      "ip": "192.168.1.200",
+      "timestamp": "2026-02-24T09:10:00Z",
+      "status": "blocked",
+      "reason": "Múltiples intentos fallidos"
+    },
+    {
+      "id": 6,
+      "username": "Operador Norte",
+      "type": "logout",
+      "ip": "192.168.1.101",
+      "timestamp": "2026-02-24T12:00:00Z",
+      "status": "success"
+    },
+    {
+      "id": 7,
+      "username": "Admin Local",
+      "type": "login",
+      "ip": "192.168.1.100",
+      "timestamp": "2026-02-24T13:00:00Z",
+      "status": "success"
+    },
+    {
+      "id": 8,
+      "username": "test_user",
+      "type": "failed",
+      "ip": "10.0.0.50",
+      "timestamp": "2026-02-24T14:00:00Z",
+      "status": "failed",
+      "reason": "Usuario no existe"
+    }
+  ],
+  "activeSessions": [
+    {
+      "id": 1,
+      "userId": 1,
+      "username": "Admin Local",
+      "role": "admin",
+      "ip": "192.168.1.100",
+      "loginTime": "2026-02-24T08:00:00Z",
+      "lastActivity": "2026-02-24T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 3,
+      "username": "Auditor General",
+      "role": "auditor",
+      "ip": "192.168.1.102",
+      "loginTime": "2026-02-24T09:00:00Z",
+      "lastActivity": "2026-02-24T14:25:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 2,
+      "username": "Operador Norte",
+      "role": "operator",
+      "ip": "192.168.1.101",
+      "loginTime": "2026-02-24T13:30:00Z",
+      "lastActivity": "2026-02-24T14:28:00Z"
+    }
+  ],
+  "rolePermissions": [
+    {
+      "id": 1,
+      "role": "admin",
+      "description": "Administrador con acceso completo al sistema",
+      "userCount": 1,
+      "permissions": {
+        "voters": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        },
+        "users": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        },
+        "zones": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        },
+        "tasks": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        },
+        "reports": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        },
+        "settings": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": true
+        }
+      }
+    },
+    {
+      "id": 2,
+      "role": "operator",
+      "description": "Operador con acceso a funciones operativas",
+      "userCount": 1,
+      "permissions": {
+        "voters": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": false
+        },
+        "users": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "zones": {
+          "read": true,
+          "create": false,
+          "update": true,
+          "delete": false
+        },
+        "tasks": {
+          "read": true,
+          "create": true,
+          "update": true,
+          "delete": false
+        },
+        "reports": {
+          "read": true,
+          "create": true,
+          "update": false,
+          "delete": false
+        },
+        "settings": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "role": "auditor",
+      "description": "Auditor con acceso de solo lectura",
+      "userCount": 1,
+      "permissions": {
+        "voters": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "users": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "zones": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "tasks": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "reports": {
+          "read": true,
+          "create": true,
+          "update": false,
+          "delete": false
+        },
+        "settings": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "role": "viewer",
+      "description": "Visualizador con acceso muy limitado",
+      "userCount": 1,
+      "permissions": {
+        "voters": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "users": {
+          "read": false,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "zones": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "tasks": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "reports": {
+          "read": true,
+          "create": false,
+          "update": false,
+          "delete": false
+        },
+        "settings": {
+          "read": false,
+          "create": false,
+          "update": false,
+          "delete": false
+        }
+      }
+    }
+  ],
+  "backups": [
+    {
+      "id": 1,
+      "name": "Backup_2026-02-24_1708761600000",
+      "date": "2026-02-24T06:00:00Z",
+      "size": "45.2 MB",
+      "type": "automatic",
+      "status": "completed",
+      "records": {
+        "voters": 10,
+        "users": 4,
+        "zones": 3,
+        "tasks": 5
+      }
+    },
+    {
+      "id": 2,
+      "name": "Backup_2026-02-23_1708675200000",
+      "date": "2026-02-23T06:00:00Z",
+      "size": "44.8 MB",
+      "type": "automatic",
+      "status": "completed",
+      "records": {
+        "voters": 10,
+        "users": 4,
+        "zones": 3,
+        "tasks": 3
+      }
+    },
+    {
+      "id": 3,
+      "name": "Backup_Manual_2026-02-22_1708620000000",
+      "date": "2026-02-22T14:00:00Z",
+      "size": "43.5 MB",
+      "type": "manual",
+      "status": "completed",
+      "records": {
+        "voters": 9,
+        "users": 4,
+        "zones": 3,
+        "tasks": 3
+      }
+    },
+    {
+      "id": 4,
+      "name": "Backup_2026-02-21_1708502400000",
+      "date": "2026-02-21T06:00:00Z",
+      "size": "42.1 MB",
+      "type": "automatic",
+      "status": "completed",
+      "records": {
+        "voters": 8,
+        "users": 3,
+        "zones": 3,
+        "tasks": 2
+      }
+    }
+  ],
   "geojson_features": {
     "type": "FeatureCollection",
     "features": [
       {
         "type": "Feature",
-        "properties": { "id": 1, "name": "Sector A" },
-        "geometry": { "type": "Polygon", "coordinates": [[[ -58.401, -34.601 ], [ -58.399, -34.601 ], [ -58.399, -34.599 ], [ -58.401, -34.599 ], [ -58.401, -34.601 ]]] }
+        "properties": {
+          "id": 1,
+          "name": "Zona Norte",
+          "priority": 1
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -58.43,
+                -34.59
+              ],
+              [
+                -58.39,
+                -34.59
+              ],
+              [
+                -58.39,
+                -34.63
+              ],
+              [
+                -58.43,
+                -34.63
+              ],
+              [
+                -58.43,
+                -34.59
+              ]
+            ]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "id": 2,
+          "name": "Zona Centro",
+          "priority": 2
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -58.44,
+                -34.63
+              ],
+              [
+                -58.4,
+                -34.63
+              ],
+              [
+                -58.4,
+                -58.67
+              ],
+              [
+                -58.44,
+                -34.67
+              ],
+              [
+                -58.44,
+                -34.63
+              ]
+            ]
+          ]
+        }
       }
     ]
   }

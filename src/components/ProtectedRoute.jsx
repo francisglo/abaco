@@ -1,25 +1,21 @@
 import React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { canAccessByRole, getDefaultPathByRole } from '../config/roleAccess'
 
-export default function ProtectedRoute({ children, requireAdmin = false }) {
-  const { user } = useAuth()
+export default function ProtectedRoute({ children, requireAdmin = false, allowedRoles = [] }) {
+  const { user, isAuthenticated } = useAuth()
 
-  if (!user) {
-    return (
-      <div style={{ padding: 16 }}>
-        <h3>Acceso requerido</h3>
-        <p>Debe iniciar sesión para ver esta sección.</p>
-      </div>
-    )
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/" replace />
   }
 
   if (requireAdmin && user.role !== 'admin') {
-    return (
-      <div style={{ padding: 16 }}>
-        <h3>Acceso denegado</h3>
-        <p>Necesitas permisos de administrador para ver esta sección.</p>
-      </div>
-    )
+    return <Navigate to={getDefaultPathByRole(user.role)} replace />
+  }
+
+  if (!canAccessByRole(user.role, allowedRoles)) {
+    return <Navigate to={getDefaultPathByRole(user.role)} replace />
   }
 
   return children

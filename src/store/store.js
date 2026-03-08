@@ -3,13 +3,21 @@ import authReducer from './authSlice'
 import zonesReducer from './zonesSlice'
 import metricsReducer from './metricsSlice'
 import geoReducer from './geoSlice'
+import votersReducer from './votersSlice'
+import usersReducer from './usersSlice'
+import tasksReducer from './tasksSlice'
+import notificationsReducer from './notificationsSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     zones: zonesReducer,
     metrics: metricsReducer,
-    geo: geoReducer
+    geo: geoReducer,
+    voters: votersReducer,
+    users: usersReducer,
+    tasks: tasksReducer,
+    notifications: notificationsReducer
   }
 })
 
