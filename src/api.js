@@ -23,47 +23,69 @@ function extractErrorMessage(body, fallback) {
   return fallback
 }
 
-export async function registerAuth(payload) {
-  const res = await fetch(`${API_V1}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-
-  const body = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new Error(extractErrorMessage(body, `Failed to register: ${res.status}`))
+function extractNetworkError(error, fallback = 'No se pudo conectar con el servidor') {
+  if (!error) return fallback
+  const raw = String(error.message || error)
+  const normalized = raw.toLowerCase()
+  if (normalized.includes('failed to fetch') || normalized.includes('networkerror')) {
+    return `${fallback}. Verifica la configuración de API y CORS.`
   }
+  return raw
+}
 
-  return body
+export async function registerAuth(payload) {
+  try {
+    const res = await fetch(`${API_V1}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+
+    const body = await parseJsonSafe(res)
+    if (!res.ok) {
+      throw new Error(extractErrorMessage(body, `Failed to register: ${res.status}`))
+    }
+
+    return body
+  } catch (error) {
+    throw new Error(extractNetworkError(error))
+  }
 }
 
 export async function loginAuth(payload) {
-  const res = await fetch(`${API_V1}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
+  try {
+    const res = await fetch(`${API_V1}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
 
-  const body = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new Error(extractErrorMessage(body, `Failed to login: ${res.status}`))
+    const body = await parseJsonSafe(res)
+    if (!res.ok) {
+      throw new Error(extractErrorMessage(body, `Failed to login: ${res.status}`))
+    }
+
+    return body
+  } catch (error) {
+    throw new Error(extractNetworkError(error))
   }
-
-  return body
 }
 
 export async function fetchAuthMe(token) {
-  const res = await fetch(`${API_V1}/auth/me`, {
-    headers: buildAuthHeaders(token)
-  })
+  try {
+    const res = await fetch(`${API_V1}/auth/me`, {
+      headers: buildAuthHeaders(token)
+    })
 
-  const body = await parseJsonSafe(res)
-  if (!res.ok) {
-    throw new Error(extractErrorMessage(body, `Failed to fetch profile: ${res.status}`))
+    const body = await parseJsonSafe(res)
+    if (!res.ok) {
+      throw new Error(extractErrorMessage(body, `Failed to fetch profile: ${res.status}`))
+    }
+
+    return body
+  } catch (error) {
+    throw new Error(extractNetworkError(error, 'No se pudo validar la sesión'))
   }
-
-  return body
 }
 
 export async function updateAuthMe(token, payload) {

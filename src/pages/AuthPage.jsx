@@ -29,6 +29,8 @@ export default function AuthPage() {
   const { login, register, loading } = useAuth()
   const [tab, setTab] = useState(0)
   const [error, setError] = useState('')
+  const [animatedLogoError, setAnimatedLogoError] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [registerForm, setRegisterForm] = useState({
@@ -183,20 +185,42 @@ export default function AuthPage() {
           >
             <Stack spacing={2.5}>
               <Box
-                component="img"
-                src={abacoLogoAnimated}
-                alt="ÁBACO dinámico"
-                sx={{
-                  width: { xs: 148, md: 180 },
-                  maxWidth: '100%',
-                  borderRadius: 2,
-                  border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
-                  bgcolor: (theme) => alpha(theme.palette.common.white, 0.1),
-                  p: 0.6
-                }}
-              />
+                sx={{ width: { xs: 148, md: 180 }, maxWidth: '100%' }}
+              >
+                {!animatedLogoError ? (
+                  <Box
+                    component="img"
+                    src={abacoLogoAnimated}
+                    alt="ÁBACO dinámico"
+                    onError={() => setAnimatedLogoError(true)}
+                    sx={{
+                      width: '100%',
+                      borderRadius: 2,
+                      border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
+                      bgcolor: (theme) => alpha(theme.palette.common.white, 0.1),
+                      p: 0.6
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      borderRadius: 2,
+                      border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
+                      bgcolor: (theme) => alpha(theme.palette.common.white, 0.12),
+                      p: 1.2,
+                      textAlign: 'center',
+                      fontWeight: 800,
+                      letterSpacing: 1.2
+                    }}
+                  >
+                    ÁBACO
+                  </Box>
+                )}
+              </Box>
               <Avatar
-                src={abacoLogo}
+                src={logoError ? undefined : abacoLogo}
+                imgProps={{ onError: () => setLogoError(true) }}
                 sx={{
                   width: 52,
                   height: 52,
