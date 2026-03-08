@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const normalizedApiBase = String(import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '')
+const API_BASE = normalizedApiBase || 'http://localhost:4000'
 const API_V1 = `${API_BASE}/api/v1`
 
 function buildAuthHeaders(token, extraHeaders = {}) {
