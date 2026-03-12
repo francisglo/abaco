@@ -7,15 +7,18 @@ import { Provider } from 'react-redux'
 import { store } from './store/store'
 import ErrorBoundary from './components/ErrorBoundary'
 import { AuthProvider } from './context/AuthContext'
+import { ViewProvider } from './context/ViewContext'
 
 const root = createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <AuthProvider>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
+        <ViewProvider>
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
+        </ViewProvider>
       </AuthProvider>
     </Provider>
   </React.StrictMode>

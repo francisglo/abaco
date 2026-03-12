@@ -9,21 +9,78 @@ import { AppError, asyncHandler } from '../middleware/errorHandler.js';
  * Controlador de autenticación
  */
 
+function sanitizeUsername(raw = '') {
+  const normalized = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  return normalized.slice(0, 24);
+}
+
+async function ensureUniqueUsername(baseSeed) {
+  const base = sanitizeUsername(baseSeed) || 'user';
+  let candidate = base;
+  let suffix = 1;
+
+  while (true) {
+    const exists = await database.queryOne(
+      'SELECT id FROM users WHERE LOWER(username) = LOWER($1)',
+      [candidate]
+    );
+
+    if (!exists) return candidate;
+
+    suffix += 1;
+    const trimmedBase = base.slice(0, Math.max(1, 24 - String(suffix).length));
+    candidate = `${trimmedBase}${suffix}`;
+  }
+}
+
+async function ensureUniqueEmail(baseSeed) {
+  const local = sanitizeUsername(baseSeed) || `user${Date.now()}`;
+  let candidate = `${local}@abaco.local`;
+  let suffix = 1;
+
+  while (true) {
+    const exists = await database.queryOne(
+      'SELECT id FROM users WHERE LOWER(email) = LOWER($1)',
+      [candidate]
+    );
+
+    if (!exists) return candidate;
+
+    suffix += 1;
+    const trimmedLocal = local.slice(0, Math.max(1, 24 - String(suffix).length));
+    candidate = `${trimmedLocal}${suffix}@abaco.local`;
+  }
+}
+
 /**
  * Registrar nuevo usuario
  * POST /api/auth/register
  */
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password, role = 'operator', phone, zoneId } = req.body;
+  const { name, email, username, password, role = 'operator', phone, zoneId } = req.body;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const normalizedUsernameRaw = sanitizeUsername(username || normalizedEmail.split('@')[0] || name);
+  const normalizedUsername = await ensureUniqueUsername(normalizedUsernameRaw || `user${Date.now()}`);
 
-  // Verificar si usuario existe
-  const existing = await database.queryOne(
-    'SELECT id FROM users WHERE email = $1',
-    [email]
+  const effectiveEmail = normalizedEmail || await ensureUniqueEmail(normalizedUsername);
+
+  if (normalizedEmail) {
+    const existingEmail = await database.queryOne(
+      'SELECT id FROM users WHERE LOWER(email) = LOWER($1)',
+      [normalizedEmail]
+    );
+    if (existingEmail) {
+      throw new AppError('Email ya registrado', 409, 'EMAIL_EXISTS');
+    }
+  }
+
+  const existingUsername = await database.queryOne(
+    'SELECT id FROM users WHERE LOWER(username) = LOWER($1)',
+    [normalizedUsername]
   );
 
-  if (existing) {
-    throw new AppError('Email ya registrado', 409, 'EMAIL_EXISTS');
+  if (existingUsername) {
+    throw new AppError('Nombre de usuario ya registrado', 409, 'USERNAME_EXISTS');
   }
 
   // Hashear contraseña
@@ -32,7 +89,8 @@ export const register = asyncHandler(async (req, res) => {
   // Insertar usuario
   const user = await database.insert('users', {
     name,
-    email,
+    email: effectiveEmail,
+    username: normalizedUsername,
     password_hash: passwordHash,
     role,
     phone,
@@ -45,6 +103,7 @@ export const register = asyncHandler(async (req, res) => {
   const token = generateToken({
     id: user.id,
     email: user.email,
+    username: user.username,
     role: user.role
   });
 
@@ -54,6 +113,7 @@ export const register = asyncHandler(async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      username: user.username,
       role: user.role
     },
     token
@@ -65,12 +125,20 @@ export const register = asyncHandler(async (req, res) => {
  * POST /api/auth/login
  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, username, identifier, password } = req.body;
+  const rawIdentifier = String(identifier || email || username || '').trim();
+  const normalizedIdentifier = rawIdentifier.toLowerCase();
+
+  if (!normalizedIdentifier) {
+    throw new AppError('Debes indicar email o username', 400, 'AUTH_IDENTIFIER_REQUIRED');
+  }
 
   // Buscar usuario
   const user = await database.queryOne(
-    'SELECT id, name, email, role, password_hash, active FROM users WHERE email = $1',
-    [email]
+    `SELECT id, name, email, username, role, password_hash, active
+     FROM users
+     WHERE LOWER(email) = $1 OR LOWER(username) = $1`,
+    [normalizedIdentifier]
   );
 
   if (!user) {
@@ -92,6 +160,7 @@ export const login = asyncHandler(async (req, res) => {
   const token = generateToken({
     id: user.id,
     email: user.email,
+    username: user.username,
     role: user.role
   });
 
@@ -113,6 +182,7 @@ export const login = asyncHandler(async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      username: user.username,
       role: user.role
     },
     token
@@ -125,7 +195,7 @@ export const login = asyncHandler(async (req, res) => {
  */
 export const getProfile = asyncHandler(async (req, res) => {
   const user = await database.queryOne(
-    'SELECT id, name, email, role, phone, zone_id, active, created_at FROM users WHERE id = $1',
+    'SELECT id, name, email, username, role, phone, zone_id, active, created_at FROM users WHERE id = $1',
     [req.user.id]
   );
 
@@ -136,6 +206,144 @@ export const getProfile = asyncHandler(async (req, res) => {
   res.json({
     user
   });
+});
+
+/**
+ * Actualizar perfil del usuario autenticado
+ * PATCH /api/auth/me
+ */
+export const updateProfile = asyncHandler(async (req, res) => {
+  const {
+    name,
+    phone,
+    role,
+    username
+  } = req.body || {};
+
+  const allowedRoles = new Set([
+    'admin',
+    'manager',
+    'operator',
+    'auditor',
+    'viewer',
+    'campaign_manager',
+    'visitor',
+    'security_monitor',
+    'administrador',
+    'administrador_del_sistema',
+    'system_admin',
+    'analista',
+    'analyst',
+    'consultor',
+    'consultant',
+    'cliente',
+    'cliente_institucional',
+    'institutional_client',
+    'publico',
+    'usuario_publico',
+    'public_user'
+  ]);
+  if (role !== undefined && !allowedRoles.has(String(role).trim().toLowerCase())) {
+    throw new AppError('Rol inválido', 400, 'INVALID_ROLE');
+  }
+
+  const updates = {};
+  if (typeof name === 'string' && name.trim()) updates.name = name.trim();
+  if (typeof phone === 'string') updates.phone = phone.trim();
+  if (typeof role === 'string') updates.role = role.trim().toLowerCase();
+  if (typeof username === 'string' && username.trim()) {
+    const normalizedUsername = sanitizeUsername(username);
+    if (!normalizedUsername) {
+      throw new AppError('Username inválido', 400, 'INVALID_USERNAME');
+    }
+    const existingUsername = await database.queryOne(
+      'SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id <> $2',
+      [normalizedUsername, req.user.id]
+    );
+    if (existingUsername) {
+      throw new AppError('Nombre de usuario ya registrado', 409, 'USERNAME_EXISTS');
+    }
+    updates.username = normalizedUsername;
+  }
+
+  if (!Object.keys(updates).length) {
+    throw new AppError('No hay campos válidos para actualizar', 400, 'NO_UPDATES');
+  }
+
+  updates.updated_at = new Date();
+
+  const rows = await database.update('users', updates, { id: req.user.id });
+  const user = rows?.[0];
+
+  if (!user) {
+    throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
+  }
+
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    role: user.role
+  });
+
+  res.json({
+    message: 'Perfil actualizado correctamente',
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      phone: user.phone,
+      zone_id: user.zone_id,
+      active: user.active,
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    },
+    token
+  });
+});
+
+/**
+ * Eliminación lógica de cuenta del usuario autenticado
+ * DELETE /api/auth/me
+ */
+export const deleteAccount = asyncHandler(async (req, res) => {
+  const { password } = req.body || {};
+  if (!password) {
+    throw new AppError('Contraseña requerida', 400, 'PASSWORD_REQUIRED');
+  }
+
+  const user = await database.queryOne(
+    'SELECT id, email, password_hash FROM users WHERE id = $1',
+    [req.user.id]
+  );
+
+  if (!user) {
+    throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
+  }
+
+  const isValid = await bcrypt.compare(password, user.password_hash);
+  if (!isValid) {
+    throw new AppError('Contraseña incorrecta', 401, 'INVALID_PASSWORD');
+  }
+
+  const tombstonePassword = await bcrypt.hash(`deleted-${Date.now()}-${user.id}`, parseInt(process.env.BCRYPT_ROUNDS, 10) || 10);
+
+  await database.update(
+    'users',
+    {
+      active: false,
+      email: `deleted_${user.id}_${Date.now()}@deleted.local`,
+      name: 'Cuenta eliminada',
+      phone: null,
+      password_hash: tombstonePassword,
+      updated_at: new Date()
+    },
+    { id: req.user.id }
+  );
+
+  res.status(204).send();
 });
 
 /**
@@ -228,7 +436,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
   }
 
   let user = await database.queryOne(
-    'SELECT id, name, email, role, active FROM users WHERE email = $1',
+    'SELECT id, name, email, username, role, active FROM users WHERE LOWER(email) = LOWER($1)',
     [googleData.email]
   );
 
@@ -237,9 +445,11 @@ export const googleAuth = asyncHandler(async (req, res) => {
     const passwordHash = await bcrypt.hash(randomPassword, parseInt(process.env.BCRYPT_ROUNDS) || 10);
 
     try {
+      const generatedUsername = await ensureUniqueUsername(googleData.email.split('@')[0] || googleData.name || `google${Date.now()}`);
       user = await database.insert('users', {
         name: googleData.name || 'Usuario Google',
         email: googleData.email,
+        username: generatedUsername,
         password_hash: passwordHash,
         role,
         phone,
@@ -252,9 +462,11 @@ export const googleAuth = asyncHandler(async (req, res) => {
         updated_at: new Date()
       });
     } catch {
+      const generatedUsername = await ensureUniqueUsername(googleData.email.split('@')[0] || googleData.name || `google${Date.now()}`);
       user = await database.insert('users', {
         name: googleData.name || 'Usuario Google',
         email: googleData.email,
+        username: generatedUsername,
         password_hash: passwordHash,
         role,
         phone,
@@ -299,6 +511,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
   const token = generateToken({
     id: user.id,
     email: user.email,
+    username: user.username,
     role: user.role
   });
 
@@ -324,6 +537,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      username: user.username,
       role: user.role
     },
     token

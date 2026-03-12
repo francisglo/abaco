@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import {
   loginAuth,
   registerAuth,
+  googleAuthLogin,
   fetchAuthMe,
   updateAuthMe,
   deleteAuthMe
@@ -11,6 +12,7 @@ const AuthContext = createContext()
 const TOKEN_KEY = 'abaco_auth_token'
 const LOCAL_USERS_KEY = 'abaco_local_users'
 const LOCAL_TOKEN_PREFIX = 'local:'
+const AUTH_ALLOW_LOCAL_FALLBACK = String(import.meta.env.VITE_AUTH_ALLOW_LOCAL_FALLBACK || '').toLowerCase() === 'true'
 
 function isNetworkAuthError(error) {
   const msg = String(error?.message || '').toLowerCase()
@@ -69,7 +71,7 @@ export function AuthProvider({ children }) {
         setUser(response?.user || null)
       })
       .catch((error) => {
-        if (isNetworkAuthError(error)) {
+        if (AUTH_ALLOW_LOCAL_FALLBACK && isNetworkAuthError(error)) {
           const localUser = findLocalUserByToken(savedToken)
           if (localUser) {
             setToken(savedToken)
@@ -101,12 +103,15 @@ export function AuthProvider({ children }) {
         if (nextToken) localStorage.setItem(TOKEN_KEY, nextToken)
         return nextUser
       } catch (error) {
-        if (!isNetworkAuthError(error)) throw error
+        if (!AUTH_ALLOW_LOCAL_FALLBACK || !isNetworkAuthError(error)) throw error
 
         const users = readLocalUsers()
-        const matched = users.find(
-          (item) => item.email?.toLowerCase() === credentials.email?.trim().toLowerCase() && item.password === credentials.password
-        )
+        const normalizedIdentifier = String(credentials.identifier || credentials.email || credentials.username || '').trim().toLowerCase()
+        const matched = users.find((item) => {
+          const emailMatch = item.email?.toLowerCase() === normalizedIdentifier
+          const usernameMatch = item.username?.toLowerCase() === normalizedIdentifier
+          return (emailMatch || usernameMatch) && item.password === credentials.password
+        })
 
         if (!matched) throw new Error('No se encontró una cuenta local con esas credenciales')
 
@@ -143,17 +148,22 @@ export function AuthProvider({ children }) {
         if (nextToken) localStorage.setItem(TOKEN_KEY, nextToken)
         return nextUser
       } catch (error) {
-        if (!isNetworkAuthError(error)) throw error
+        if (!AUTH_ALLOW_LOCAL_FALLBACK || !isNetworkAuthError(error)) throw error
 
         const users = readLocalUsers()
-        const normalizedEmail = payload.email?.trim().toLowerCase()
-        const exists = users.some((item) => item.email?.toLowerCase() === normalizedEmail)
-        if (exists) throw new Error('Ya existe una cuenta local con ese correo')
+        const normalizedEmail = payload.email?.trim().toLowerCase() || ''
+        const normalizedUsername = payload.username?.trim().toLowerCase() || ''
+        const exists = users.some((item) => (
+          (normalizedEmail && item.email?.toLowerCase() === normalizedEmail)
+          || (normalizedUsername && item.username?.toLowerCase() === normalizedUsername)
+        ))
+        if (exists) throw new Error('Ya existe una cuenta local con ese usuario/correo')
 
         const newLocalUser = {
           id: Date.now(),
           name: payload.name?.trim() || 'Usuario',
           email: normalizedEmail,
+          username: normalizedUsername,
           phone: payload.phone?.trim() || '',
           bio: payload.bio?.trim() || '',
           role: 'operator',
@@ -177,6 +187,23 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function loginWithGoogle(idToken) {
+    if (!idToken) throw new Error('Token de Google inválido')
+    setLoading(true)
+    try {
+      const response = await googleAuthLogin({ idToken })
+      const nextToken = response?.token || ''
+      const nextUser = response?.user || null
+
+      setToken(nextToken)
+      setUser(nextUser)
+      if (nextToken) localStorage.setItem(TOKEN_KEY, nextToken)
+      return nextUser
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function refreshProfile() {
     if (!token) return null
     setLoading(true)
@@ -194,6 +221,9 @@ export function AuthProvider({ children }) {
     setLoading(true)
     try {
       const response = await updateAuthMe(token, payload)
+      const nextToken = response?.token || token
+      setToken(nextToken)
+      if (nextToken) localStorage.setItem(TOKEN_KEY, nextToken)
       setUser(response?.user || null)
       return response?.user || null
     } finally {
@@ -224,6 +254,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        loginWithGoogle,
         refreshProfile,
         updateProfile,
         deleteAccount

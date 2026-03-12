@@ -1,0 +1,53 @@
+name: Platform QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+  role-matrix:
+    name: Backend Role Matrix
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend deps
+        run: npm --prefix backend ci
+
+      - name: Run role matrix QA
+        env:
+          QA_BASE_URL: ${{ vars.QA_BASE_URL }}
+          QA_PASSWORD: ${{ secrets.QA_PASSWORD }}
+        run: npm --prefix backend run qa:roles

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Alert,
   alpha,
@@ -26,15 +26,17 @@ import abacoLogo from '../../TFG/TFG.png'
 import abacoLogoAnimated from '../../TFG/TFG.GIF?url'
 
 export default function AuthPage() {
-  const { login, register, loading } = useAuth()
+  const { login, register, loginWithGoogle, loading } = useAuth()
   const [tab, setTab] = useState(0)
   const [error, setError] = useState('')
   const [animatedLogoError, setAnimatedLogoError] = useState(false)
   const [logoError, setLogoError] = useState(false)
 
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const googleButtonRef = useRef(null)
+  const [loginForm, setLoginForm] = useState({ identifier: '', password: '' })
   const [registerForm, setRegisterForm] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -54,7 +56,7 @@ export default function AuthPage() {
     event.preventDefault()
     setError('')
     try {
-      await login({ email: loginForm.email.trim(), password: loginForm.password })
+      await login({ identifier: loginForm.identifier.trim(), password: loginForm.password })
     } catch (submitError) {
       setError(submitError.message || 'No se pudo iniciar sesión')
     }
@@ -77,6 +79,7 @@ export default function AuthPage() {
     try {
       await register({
         name: registerForm.name.trim(),
+        username: registerForm.username.trim(),
         email: registerForm.email.trim(),
         password: registerForm.password,
         phone: registerForm.phone.trim(),
@@ -86,6 +89,61 @@ export default function AuthPage() {
       setError(submitError.message || 'No se pudo crear la cuenta')
     }
   }
+
+  useEffect(() => {
+    const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim()
+    if (!clientId || !googleButtonRef.current) return
+
+    const ensureScript = () => new Promise((resolve, reject) => {
+      if (window.google?.accounts?.id) {
+        resolve()
+        return
+      }
+
+      const existing = document.querySelector('script[data-google-identity="true"]')
+      if (existing) {
+        existing.addEventListener('load', () => resolve(), { once: true })
+        existing.addEventListener('error', () => reject(new Error('No se pudo cargar Google Identity')), { once: true })
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://accounts.google.com/gsi/client'
+      script.async = true
+      script.defer = true
+      script.dataset.googleIdentity = 'true'
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error('No se pudo cargar Google Identity'))
+      document.head.appendChild(script)
+    })
+
+    ensureScript()
+      .then(() => {
+        if (!window.google?.accounts?.id || !googleButtonRef.current) return
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            try {
+              if (!response?.credential) throw new Error('Google no devolvió credential')
+              await loginWithGoogle(response.credential)
+            } catch (googleError) {
+              setError(googleError.message || 'No se pudo iniciar sesión con Google')
+            }
+          }
+        })
+
+        googleButtonRef.current.innerHTML = ''
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          shape: 'rectangular',
+          width: 320
+        })
+      })
+      .catch((scriptError) => {
+        setError(scriptError.message || 'No se pudo inicializar Google Sign-In')
+      })
+  }, [loginWithGoogle])
 
   return (
     <Box
@@ -294,10 +352,9 @@ export default function AuthPage() {
                       <Box component="form" onSubmit={onSubmitLogin}>
                         <Stack spacing={2}>
                           <TextField
-                            label="Correo"
-                            type="email"
-                            value={loginForm.email}
-                            onChange={onChangeLogin('email')}
+                            label="Usuario o correo"
+                            value={loginForm.identifier}
+                            onChange={onChangeLogin('identifier')}
                             required
                             fullWidth
                             InputProps={{
@@ -341,6 +398,8 @@ export default function AuthPage() {
                           >
                             {loading ? <CircularProgress size={22} color="inherit" /> : 'Entrar'}
                           </Button>
+                          <Divider>o</Divider>
+                          <Box ref={googleButtonRef} sx={{ display: 'flex', justifyContent: 'center' }} />
                         </Stack>
                       </Box>
                     </Slide>
@@ -363,12 +422,19 @@ export default function AuthPage() {
                             }}
                           />
                           <TextField
+                            label="Usuario"
+                            value={registerForm.username}
+                            onChange={onChangeRegister('username')}
+                            required
+                            fullWidth
+                          />
+                          <TextField
                             label="Correo"
                             type="email"
                             value={registerForm.email}
                             onChange={onChangeRegister('email')}
-                            required
                             fullWidth
+                            helperText="Opcional: si lo dejas vacío, se crea cuenta sin email"
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">

@@ -1,5 +1,29 @@
 # Testing Guide - ÁBACO Backend
 
+## ✅ Regresión rápida por roles (producción/staging)
+
+Ejecuta una matriz automática de permisos para `admin`, `manager`, `operator` y `viewer`.
+
+```bash
+npm run qa:roles
+```
+
+Variables opcionales:
+
+- `QA_BASE_URL`: URL base del backend (default: `https://backend-two-xi-81.vercel.app`)
+- `QA_PASSWORD`: contraseña usada al crear usuarios de prueba (default: `Clave123!`)
+
+Ejemplo apuntando a otro entorno:
+
+```bash
+QA_BASE_URL=https://tu-backend.vercel.app npm run qa:roles
+```
+
+Notas:
+
+- El script crea usuarios de prueba nuevos en cada ejecución.
+- Devuelve código de salida `1` si encuentra cualquier `FAIL` en la matriz.
+
 ## 📋 Configuración del Testing
 
 ### Instalar dependencias

@@ -6,8 +6,20 @@ dotenv.config();
 
 const ROLE_ALIASES = {
   campaign_manager: 'manager',
-  visitor: 'viewer',
-  security_monitor: 'auditor'
+  security_monitor: 'auditor',
+  administrador: 'admin',
+  administrador_del_sistema: 'admin',
+  system_admin: 'admin',
+  analista: 'auditor',
+  analyst: 'auditor',
+  consultor: 'auditor',
+  consultant: 'auditor',
+  cliente: 'viewer',
+  cliente_institucional: 'viewer',
+  institutional_client: 'viewer',
+  publico: 'visitor',
+  usuario_publico: 'visitor',
+  public_user: 'visitor'
 };
 
 function normalizeRole(role) {

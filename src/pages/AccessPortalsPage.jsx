@@ -11,7 +11,10 @@ import {
   MdLocationOn,
   MdTask,
   MdPeople,
-  MdHistory
+  MdHistory,
+  MdHowToVote,
+  MdCorporateFare,
+  MdHub
 } from 'react-icons/md'
 
 export default function AccessPortalsPage() {
@@ -36,6 +39,7 @@ export default function AccessPortalsPage() {
       icon: <MdAnalytics size={30} />,
       quickLinks: [
         { label: 'BI y Consultas', path: '/query-analytics', icon: <MdAnalytics size={16} /> },
+        { label: 'Algoritmos Operativos', path: '/operational-algorithms', icon: <MdAnalytics size={16} /> },
         { label: 'Indicadores', path: '/management-indicators', icon: <MdAnalytics size={16} /> },
         { label: 'Inteligencia Estratégica', path: '/strategic-intelligence', icon: <MdAnalytics size={16} /> },
         { label: 'Georreferencia', path: '/georeference', icon: <MdMap size={16} /> },
@@ -68,6 +72,81 @@ export default function AccessPortalsPage() {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: theme.palette.background.default }}>
       <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+        <Grid container spacing={2} sx={{ mb: 2.5 }}>
+          <Grid item xs={12} md={6}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`,
+                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.08)} 100%)`
+              }}
+            >
+              <CardContent>
+                <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 1 }}>
+                  <MdHowToVote size={24} color={theme.palette.primary.main} />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                    Sección ÁBACO Electoral
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
+                  Agrupa toda la operación electoral de ÁBACO en un solo punto de acceso.
+                </Typography>
+                <Button variant="contained" endIcon={<MdArrowForward size={18} />} onClick={() => navigate('/abaco-electoral')}>
+                  Entrar a sección
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`,
+                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.08)} 100%)`
+              }}
+            >
+              <CardContent>
+                <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 1 }}>
+                  <MdCorporateFare size={24} color={theme.palette.primary.main} />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                    Sección ÁBACO Gubernamental
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
+                  Agrupa la división gubernamental con gestión pública, inteligencia y atención ciudadana.
+                </Typography>
+                <Button variant="contained" endIcon={<MdArrowForward size={18} />} onClick={() => navigate('/abaco-gubernamental')}>
+                  Entrar a sección
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`,
+                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.08)} 100%)`
+              }}
+            >
+              <CardContent>
+                <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 1 }}>
+                  <MdHub size={24} color={theme.palette.primary.main} />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                    Sección ÁBACO Verticales
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
+                  Reúne los verticales estratégicos en economía, desarrollo, sostenibilidad y gobernanza territorial.
+                </Typography>
+                <Button variant="contained" endIcon={<MdArrowForward size={18} />} onClick={() => navigate('/abaco-verticales')}>
+                  Entrar a sección
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
         <Box
           sx={{
             mb: 4,

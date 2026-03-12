@@ -21,6 +21,8 @@ router.post('/google', validate('googleAuth'), authController.googleAuth);
 
 // Rutas protegidas (requieren token)
 router.get('/me', authenticate, authController.getProfile);
+router.patch('/me', authenticate, authController.updateProfile);
+router.delete('/me', authenticate, authController.deleteAccount);
 router.post('/change-password', authenticate, validate('changePassword'), authController.changePassword);
 router.post('/logout', authenticate, authController.logout);
 

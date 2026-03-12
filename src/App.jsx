@@ -39,6 +39,14 @@ const TerritorialCommunicationPage = lazy(() => import('./pages/TerritorialCommu
 const ManagementIndicatorsPage = lazy(() => import('./pages/ManagementIndicatorsPage'))
 const StrategicIntelligencePage = lazy(() => import('./pages/StrategicIntelligencePage'))
 const AccessPortalsPage = lazy(() => import('./pages/AccessPortalsPage'))
+const FinancialTerritorialIntelligencePage = lazy(() => import('./pages/FinancialTerritorialIntelligencePage'))
+const AbacoElectoralSectionPage = lazy(() => import('./pages/AbacoElectoralSectionPage'))
+const AbacoGubernamentalSectionPage = lazy(() => import('./pages/AbacoGubernamentalSectionPage'))
+const AbacoAdministrationSectionPage = lazy(() => import('./pages/AbacoAdministrationSectionPage'))
+const AbacoVerticalsSectionPage = lazy(() => import('./pages/AbacoVerticalsSectionPage'))
+const AbacoVerticalDetailPage = lazy(() => import('./pages/AbacoVerticalDetailPage'))
+const AbacoIntegratedBiPage = lazy(() => import('./pages/AbacoIntegratedBiPage'))
+const OperationalAlgorithmsPage = lazy(() => import('./pages/OperationalAlgorithmsPage'))
 
 // Componente de carga
 function LoadingFallback() {
@@ -103,10 +111,18 @@ export default function App() {
                 <Route path="/abaco-training" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'viewer']}><AbacoTrainingPage /></ProtectedRoute>} />
                 <Route path="/abaco-ascend" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor']}><AbacoAscendPage /></ProtectedRoute>} />
                 <Route path="/portales" element={<AccessPortalsPage />} />
+                <Route path="/abaco-electoral" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoElectoralSectionPage /></ProtectedRoute>} />
+                <Route path="/abaco-gubernamental" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoGubernamentalSectionPage /></ProtectedRoute>} />
+                <Route path="/abaco-administracion" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoAdministrationSectionPage /></ProtectedRoute>} />
+                <Route path="/abaco-verticales" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoVerticalsSectionPage /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/:slug" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoVerticalDetailPage /></ProtectedRoute>} />
+                <Route path="/abaco-bi-integrador" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><AbacoIntegratedBiPage /></ProtectedRoute>} />
+                <Route path="/operational-algorithms" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><OperationalAlgorithmsPage /></ProtectedRoute>} />
                 <Route path="/citizen-requests" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'visitor']}><CitizenRequestsPage /></ProtectedRoute>} />
                 <Route path="/territorial-communication" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator']}><TerritorialCommunicationPage /></ProtectedRoute>} />
                 <Route path="/management-indicators" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'auditor', 'viewer']}><ManagementIndicatorsPage /></ProtectedRoute>} />
                 <Route path="/strategic-intelligence" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'auditor']}><StrategicIntelligencePage /></ProtectedRoute>} />
+                <Route path="/financial-intelligence" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><FinancialTerritorialIntelligencePage /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to={roleHome} replace />} />
               </Routes>
             </Suspense>

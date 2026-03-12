@@ -11,7 +11,11 @@ import {
   Collapse,
   CircularProgress,
   Divider,
+  FormControl,
+  InputLabel,
   LinearProgress,
+  MenuItem,
+  Select,
   Link,
   Stack,
   TextField,
@@ -24,6 +28,7 @@ import { IoRocketOutline } from 'react-icons/io5'
 import { TbShieldLock } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getDefaultPathByRole } from '../config/roleAccess'
 
 function toDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -43,6 +48,7 @@ export default function ProfilePage() {
 
   const [form, setForm] = useState(() => ({
     name: user?.name || '',
+    role: user?.role || 'operator',
     phone: user?.profile?.phone || user?.phone || '',
     bio: user?.profile?.bio || '',
     avatar: user?.profile?.avatar || '',
@@ -153,6 +159,7 @@ export default function ProfilePage() {
     try {
       await updateProfile({
         name: form.name.trim(),
+        role: form.role,
         phone: form.phone.trim(),
         bio: form.bio.trim(),
         avatar: form.avatar,
@@ -174,6 +181,7 @@ export default function ProfilePage() {
           .filter(Boolean)
       })
       setSuccess('Perfil actualizado correctamente')
+      navigate(getDefaultPathByRole(form.role), { replace: true })
     } catch (saveError) {
       setError(saveError.message || 'No se pudo actualizar el perfil')
     }
@@ -330,6 +338,20 @@ export default function ProfilePage() {
                         <Typography variant="body2" color="text.secondary">Información principal del perfil.</Typography>
                         <TextField label="Nombre" value={form.name} onChange={onChange('name')} required fullWidth />
                         <TextField label="Correo" value={user?.email || ''} disabled fullWidth />
+                        <FormControl fullWidth>
+                          <InputLabel id="profile-role-label">Rol activo</InputLabel>
+                          <Select
+                            labelId="profile-role-label"
+                            label="Rol activo"
+                            value={form.role}
+                            onChange={onChange('role')}
+                          >
+                            <MenuItem value="manager">Manager</MenuItem>
+                            <MenuItem value="operator">Operador</MenuItem>
+                            <MenuItem value="auditor">Auditor</MenuItem>
+                            <MenuItem value="viewer">Visualizador</MenuItem>
+                          </Select>
+                        </FormControl>
                         <TextField label="Teléfono" value={form.phone} onChange={onChange('phone')} fullWidth />
                         <TextField
                           label="Titular profesional"

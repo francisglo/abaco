@@ -20,6 +20,9 @@ import searchRoutes from './routes/search.js';
 import geoRoutes from './routes/geo.js';
 import geoAnalyticsRoutes from './routes/geoAnalytics.js';
 import ledgerRoutes from './routes/ledger.js';
+import financialIntelligenceRoutes from './routes/financialIntelligence.js';
+import demographicSocialRoutes from './routes/demographicSocial.js';
+import operationalAlgorithmsRoutes from './routes/operationalAlgorithms.js';
 
 // Importar middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -84,7 +87,9 @@ app.get('/api', (req, res) => {
       indicators: ['management-indicators'],
       intelligence: ['strategic-intelligence'],
       business: ['subscriptions'],
-      utilities: ['search', 'geo', 'geo-analytics', 'ledger']
+      utilities: ['search', 'geo', 'geo-analytics', 'ledger'],
+      financial: ['financial-intelligence'],
+      operations: ['operational-algorithms']
     },
     endpoints: {
       auth: '/api/auth',
@@ -112,7 +117,32 @@ app.get('/api', (req, res) => {
       ledgerAnchorLatest: '/api/ledger/anchor-latest',
       ledgerAnchorStatus: '/api/ledger/anchor-status',
       ledgerAnchorPending: '/api/ledger/anchor-pending?limit=20',
-      ledgerAnchorMetrics: '/api/ledger/anchor-metrics'
+      ledgerAnchorMetrics: '/api/ledger/anchor-metrics',
+      financialSummary: '/api/financial-intelligence/summary?limit=6',
+      demographicSocialSummary: '/api/demographic-social/summary?limit=8',
+      operationalZonePrioritization: '/api/operational-algorithms/zone-prioritization?limit=10',
+      operationalBrigadeAssignment: '/api/operational-algorithms/brigade-assignment',
+      operationalRouting: '/api/operational-algorithms/territorial-routing?limit=40',
+      operationalSemaphore: '/api/operational-algorithms/semaphore-alerts',
+      operationalLoadBalance: '/api/operational-algorithms/load-balance',
+      operationalRulesCatalog: '/api/operational-algorithms/rules-engine/catalog',
+      operationalRulesEvaluate: '/api/operational-algorithms/rules-engine/evaluate',
+      operationalAdvancedCatalog: '/api/operational-algorithms/advanced-suite/catalog',
+      operationalAdvancedRun: '/api/operational-algorithms/advanced-suite/run?limit=10',
+      operationalAdvancedActivationLogs: '/api/operational-algorithms/advanced-suite/activation-logs?limit=50',
+      operationalPredictiveCatalog: '/api/operational-algorithms/predictive-models/catalog',
+      operationalPredictiveRun: '/api/operational-algorithms/predictive-models/run?limit=10&horizon_days=45',
+      operationalOptimizationCatalog: '/api/operational-algorithms/optimization-models/catalog',
+      operationalOptimizationRun: '/api/operational-algorithms/optimization-models/run?limit=10&brigades=12&budget=120000',
+      operationalWhatIfSimulation: '/api/operational-algorithms/what-if/simulate?budget=150000&brigades=14&expected_turnout_delta=8',
+      operationalActionCenter: '/api/operational-algorithms/action-center/recommendations?limit=10',
+      operationalEarlyAlerts: '/api/operational-algorithms/early-alerts?risk_threshold=70&coverage_threshold=60',
+      operationalEarlyAlertsNotifyStatus: '/api/operational-algorithms/early-alerts/notify/status',
+      operationalEarlyAlertsNotify: '/api/operational-algorithms/early-alerts/notify',
+      operationalDecisionLog: '/api/operational-algorithms/decision-log?limit=30',
+      operationalTemporalComparison: '/api/operational-algorithms/temporal-comparison?period=weekly&buckets=8',
+      operationalDailyBoard: '/api/operational-algorithms/daily-operations/board',
+      operationalDataQuality: '/api/operational-algorithms/data-quality/report'
     },
     docs: 'https://github.com/tu-repo/wiki/API'
   });
@@ -164,6 +194,18 @@ app.use('/api/v1/geo-analytics', geoAnalyticsRoutes);
 // Ledger encadenado cifrado (blockchain interno)
 app.use('/api/ledger', ledgerRoutes);
 app.use('/api/v1/ledger', ledgerRoutes);
+
+// Inteligencia Financiera Territorial
+app.use('/api/financial-intelligence', financialIntelligenceRoutes);
+app.use('/api/v1/financial-intelligence', financialIntelligenceRoutes);
+
+// Inteligencia Demográfica y Social
+app.use('/api/demographic-social', demographicSocialRoutes);
+app.use('/api/v1/demographic-social', demographicSocialRoutes);
+
+// Algoritmos Operativos Territoriales (determinísticos)
+app.use('/api/operational-algorithms', operationalAlgorithmsRoutes);
+app.use('/api/v1/operational-algorithms', operationalAlgorithmsRoutes);
 
 // ===== MANEJO DE RUTAS NO ENCONTRADAS =====
 app.use((req, res) => {

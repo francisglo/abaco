@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { AppBar, Toolbar, Typography, Drawer, List, ListItemButton, ListItemText, Box, IconButton, Divider, ListItemIcon, useTheme, alpha, Tooltip, Avatar, Menu, MenuItem, useMediaQuery } from '@mui/material'
-import { Link, useLocation } from 'react-router-dom'
+import { AppBar, Toolbar, Typography, Drawer, List, ListItemButton, ListItemText, Box, IconButton, Divider, ListItemIcon, useTheme, alpha, Tooltip, Avatar, Menu, MenuItem, useMediaQuery, Chip, Button, Select } from '@mui/material'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   MdMenu,
   MdDashboard,
@@ -25,14 +25,19 @@ import {
   MdSupportAgent,
   MdConnectWithoutContact,
   MdInsights,
-  MdManageSearch
+  MdManageSearch,
+  MdAccountBalance,
+  MdHowToVote,
+  MdCorporateFare,
+  MdHub
 } from 'react-icons/md'
 import { HiUsers } from 'react-icons/hi'
 import { RiContactsBook2Fill } from 'react-icons/ri'
 import NotificationsPanel from './NotificationsPanel'
 import { useAuth } from '../context/AuthContext'
+import { useViewContext, VIEW_TERRITORIES, VIEW_PROJECTS, VIEW_TERRITORY_FILTER_MODES } from '../context/ViewContext'
 import abacoLogo from '../../TFG/TFG.png'
-import { canAccessByRole, normalizeRole } from '../config/roleAccess'
+import { canAccessByRole, normalizeRole, getRoleLabel, getViewModeByPath, VIEW_MODES } from '../config/roleAccess'
 
 const drawerWidth = 260
 
@@ -40,9 +45,14 @@ export default function Layout({ children }) {
   const [open, setOpen] = useState(true)
   const [anchorEl, setAnchorEl] = useState(null)
   const location = useLocation()
+  const navigate = useNavigate()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { user, logout } = useAuth()
+  const { territory, project, territoryFilterMode, setTerritory, setProject, setTerritoryFilterMode } = useViewContext()
+  const activeViewMode = getViewModeByPath(location.pathname)
+  const viewModeLabel = VIEW_MODES[activeViewMode] || VIEW_MODES.visualization
+  const roleLabel = getRoleLabel(user?.role)
 
   useEffect(() => {
     if (isMobile && open) {
@@ -64,35 +74,68 @@ export default function Layout({ children }) {
     return { key: 'abaco', suffix: '', caption: '', animated: false }
   }, [location.pathname])
 
-  const menuItems = [
-    { text: 'Inicio', icon: <MdDashboard size={20} />, path: '/', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
-    { text: 'Portales', icon: <MdDashboard size={20} />, path: '/portales', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
-    { text: 'Dashboard Ejecutivo', icon: <MdSpaceDashboard size={20} />, path: '/dashboard', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer'] },
-    { text: 'Territorios', icon: <MdLocationOn size={20} />, path: '/zones', allowedRoles: ['admin', 'manager', 'operator'] },
-    { text: 'Contactos', icon: <RiContactsBook2Fill size={20} />, path: '/voters', allowedRoles: ['admin', 'manager', 'operator'] },
-    { text: 'Usuarios', icon: <HiUsers size={20} />, path: '/users', allowedRoles: ['admin'] },
-    { text: 'Tareas', icon: <MdTask size={20} />, path: '/tasks', allowedRoles: ['admin', 'manager', 'operator'] },
-    { text: 'Gestión de Datos', icon: <MdDataset size={20} />, path: '/data-management', allowedRoles: ['admin', 'manager'] },
-    { text: 'Análisis (BI)', icon: <MdAnalytics size={20} />, path: '/query-analytics', allowedRoles: ['admin', 'manager', 'auditor', 'viewer'] },
-    { text: 'Georreferencia', icon: <MdMap size={20} />, path: '/georeference', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer'] },
-    { text: 'Encuestas', icon: <MdPoll size={20} />, path: '/surveys', allowedRoles: ['admin', 'manager', 'operator', 'visitor'] },
-    { text: 'Archivos', icon: <MdFolder size={20} />, path: '/files', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
-    { text: 'Auditoría', icon: <MdHistory size={20} />, path: '/audit', allowedRoles: ['admin', 'auditor'] },
-    { text: 'Leaderboard', icon: <MdTrendingUp size={20} />, path: '/leaderboard', allowedRoles: ['admin', 'manager', 'operator', 'viewer'] },
-    { text: 'Alertas Inteligentes', icon: <MdWarning size={20} />, path: '/smart-alerts', allowedRoles: ['admin', 'manager', 'auditor'] },
-    { text: 'ÁBACO Training', icon: <MdSchool size={20} />, path: '/abaco-training', allowedRoles: ['admin', 'manager', 'operator', 'viewer'] },
-    { text: 'ÁBACO ASEND', icon: <MdAutoGraph size={20} />, path: '/abaco-ascend', allowedRoles: ['admin', 'manager', 'operator', 'auditor'] },
-    { text: 'Solicitudes Ciudadanas', icon: <MdSupportAgent size={20} />, path: '/citizen-requests', allowedRoles: ['admin', 'manager', 'operator', 'visitor'] },
-    { text: 'Comunicación Territorial', icon: <MdConnectWithoutContact size={20} />, path: '/territorial-communication', allowedRoles: ['admin', 'manager', 'operator'] },
-    { text: 'Indicadores de Gestión', icon: <MdInsights size={20} />, path: '/management-indicators', allowedRoles: ['admin', 'manager', 'auditor', 'viewer'] },
-    { text: 'Inteligencia Estratégica', icon: <MdManageSearch size={20} />, path: '/strategic-intelligence', allowedRoles: ['admin', 'manager', 'auditor'] },
-    { text: 'Configuración', icon: <MdSettings size={20} />, path: '/settings', allowedRoles: ['admin', 'manager'] },
+  const focusedSectionTitle = useMemo(() => {
+    if (location.pathname.startsWith('/abaco-electoral')) return 'Electoral'
+    if (location.pathname.startsWith('/abaco-gubernamental')) return 'Gubernamental'
+    if (location.pathname.startsWith('/financial-intelligence')) return 'Gubernamental'
+    if (location.pathname.startsWith('/abaco-verticales') || location.pathname.startsWith('/abaco-bi-integrador') || location.pathname.startsWith('/operational-algorithms')) return 'Verticales'
+    if (location.pathname.startsWith('/abaco-administracion') || location.pathname.startsWith('/settings')) return 'Administración'
+    return null
+  }, [location.pathname])
+
+  const menuSections = [
+    {
+      title: 'Plataforma',
+      items: [
+        { text: 'Inicio', icon: <MdDashboard size={20} />, path: '/', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Portales', icon: <MdDashboard size={20} />, path: '/portales', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+      ]
+    },
+    {
+      title: 'Electoral',
+      items: [
+        { text: 'Panel Electoral', icon: <MdHowToVote size={20} />, path: '/abaco-electoral', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+      ]
+    },
+    {
+      title: 'Gubernamental',
+      items: [
+        { text: 'Panel Gubernamental', icon: <MdCorporateFare size={20} />, path: '/abaco-gubernamental', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Panel de Decisión', icon: <MdAccountBalance size={20} />, path: '/financial-intelligence', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer'] },
+      ]
+    },
+    {
+      title: 'Verticales',
+      items: [
+        { text: 'Panel de Verticales', icon: <MdHub size={20} />, path: '/abaco-verticales', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Algoritmos Operativos', icon: <MdAutoGraph size={20} />, path: '/operational-algorithms', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer'] },
+      ]
+    },
+    {
+      title: 'Administración',
+      items: [
+        { text: 'Panel de Administración', icon: <MdSettings size={20} />, path: '/abaco-administracion', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+      ]
+    }
   ]
 
-  const visibleMenuItems = useMemo(() => {
+  const visibleMenuSections = useMemo(() => {
     const normalizedRole = normalizeRole(user?.role)
-    return menuItems.filter((item) => canAccessByRole(normalizedRole, item.allowedRoles))
-  }, [menuItems, user?.role])
+    const roleFilteredSections = menuSections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => canAccessByRole(normalizedRole, item.allowedRoles))
+      }))
+      .filter((section) => section.items.length > 0)
+
+    if (!focusedSectionTitle) {
+      return roleFilteredSections
+    }
+
+    return roleFilteredSections.filter((section) => (
+      section.title === 'Plataforma' || section.title === focusedSectionTitle
+    ))
+  }, [user?.role, focusedSectionTitle])
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget)
@@ -210,6 +253,89 @@ export default function Layout({ children }) {
           </Box>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+            {!isMobile && (
+              <>
+                <Select
+                  size="small"
+                  value={territory}
+                  onChange={(event) => setTerritory(event.target.value)}
+                  sx={{
+                    minWidth: 118,
+                    height: 30,
+                    fontSize: '0.78rem',
+                    borderRadius: 2,
+                    color: theme.palette.primary.main,
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.palette.primary.main, 0.25) }
+                  }}
+                >
+                  {VIEW_TERRITORIES.map((item) => (
+                    <MenuItem key={item} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  size="small"
+                  value={project}
+                  onChange={(event) => setProject(event.target.value)}
+                  sx={{
+                    minWidth: 138,
+                    height: 30,
+                    fontSize: '0.78rem',
+                    borderRadius: 2,
+                    color: theme.palette.secondary.main,
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.palette.secondary.main, 0.3) }
+                  }}
+                >
+                  {VIEW_PROJECTS.map((item) => (
+                    <MenuItem key={item} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  size="small"
+                  value={territoryFilterMode}
+                  onChange={(event) => setTerritoryFilterMode(event.target.value)}
+                  sx={{
+                    minWidth: 112,
+                    height: 30,
+                    fontSize: '0.78rem',
+                    borderRadius: 2,
+                    color: theme.palette.text.secondary,
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.palette.text.secondary, 0.28) }
+                  }}
+                >
+                  {VIEW_TERRITORY_FILTER_MODES.map((item) => (
+                    <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
+                  ))}
+                </Select>
+                <Chip
+                  size="small"
+                  label={roleLabel}
+                  variant="outlined"
+                  sx={{ borderColor: alpha(theme.palette.primary.main, 0.25), color: theme.palette.primary.main, fontWeight: 600 }}
+                />
+                <Chip
+                  size="small"
+                  label={viewModeLabel}
+                  variant="outlined"
+                  sx={{ borderColor: alpha(theme.palette.secondary.main, 0.3), color: theme.palette.secondary.main, fontWeight: 600 }}
+                />
+              </>
+            )}
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => navigate('/portales')}
+              sx={{
+                textTransform: 'none',
+                borderColor: alpha(theme.palette.primary.main, 0.28),
+                color: theme.palette.primary.main,
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: alpha(theme.palette.primary.main, 0.06)
+                }
+              }}
+            >
+              Menú principal
+            </Button>
             <NotificationsPanel />
             <Tooltip title="Perfil">
               <IconButton 
@@ -275,52 +401,112 @@ export default function Layout({ children }) {
       >
         <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)' }}>
           <List sx={{ px: 1, py: 2, flex: 1 }}>
-            {visibleMenuItems.map((item) => {
-              const isActive = location.pathname === item.path || 
-                              (item.path !== '/' && location.pathname.startsWith(item.path))
-              return (
-                <Tooltip key={item.text} title={!open ? item.text : ''} placement="right">
-                  <ListItemButton
-                    component={Link}
-                    to={item.path}
-                    onClick={() => {
-                      if (isMobile) setOpen(false)
-                    }}
+            {visibleMenuSections.map((section, sectionIndex) => (
+              <React.Fragment key={section.title}>
+                {open && (
+                  <Box
                     sx={{
-                      mb: 1,
-                      borderRadius: '8px',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                      color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
-                      justifyContent: open ? 'flex-start' : 'center',
-                      px: open ? 2 : 1.5,
-                      '&:hover': {
-                        bgcolor: alpha(theme.palette.primary.main, isActive ? 0.15 : 0.08),
-                        color: theme.palette.primary.main
-                      },
-                      '& .MuiListItemIcon-root': {
-                        color: 'inherit',
-                        minWidth: open ? 40 : 'auto',
-                      },
+                      px: 1.4,
+                      pt: sectionIndex === 0 ? 0 : 1.25,
+                      pb: 0.8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 1
                     }}
                   >
-                    <ListItemIcon sx={{ minWidth: open ? 40 : 'auto', ml: open ? 0 : -1 }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    {open && (
-                      <ListItemText 
-                        primary={item.text} 
-                        primaryTypographyProps={{
-                          fontWeight: isActive ? 600 : 500,
-                          fontSize: '0.875rem',
-                          letterSpacing: '0.3px'
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: ((focusedSectionTitle && section.title === focusedSectionTitle)
+                          || (!focusedSectionTitle && section.title === 'Plataforma'))
+                          ? theme.palette.primary.main
+                          : alpha(theme.palette.text.secondary, 0.9),
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        transition: theme.transitions.create(['color', 'opacity'], {
+                          duration: 220,
+                          easing: theme.transitions.easing.easeOut
+                        })
+                      }}
+                    >
+                      {section.title}
+                    </Typography>
+                    {((focusedSectionTitle && section.title === focusedSectionTitle)
+                      || (!focusedSectionTitle && section.title === 'Plataforma')) && (
+                      <Chip
+                        size="small"
+                        color={focusedSectionTitle ? 'primary' : 'default'}
+                        variant={focusedSectionTitle ? 'filled' : 'outlined'}
+                        label={focusedSectionTitle ? 'Activa' : 'General'}
+                        sx={{
+                          height: 18,
+                          transition: theme.transitions.create(['transform', 'opacity', 'background-color', 'border-color'], {
+                            duration: 220,
+                            easing: theme.transitions.easing.easeOut
+                          }),
+                          transform: 'translateY(0)',
+                          '& .MuiChip-label': { px: 0.8, fontSize: '0.62rem', fontWeight: 700 }
                         }}
                       />
                     )}
-                  </ListItemButton>
-                </Tooltip>
-              )
-            })}
+                  </Box>
+                )}
+
+                {section.items.map((item) => {
+                  const isActive = location.pathname === item.path ||
+                    (item.path !== '/' && location.pathname.startsWith(item.path))
+
+                  return (
+                    <Tooltip key={item.text} title={!open ? item.text : ''} placement="right">
+                      <ListItemButton
+                        component={Link}
+                        to={item.path}
+                        onClick={() => {
+                          if (isMobile) setOpen(false)
+                        }}
+                        sx={{
+                          mb: 1,
+                          borderRadius: '8px',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                          color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
+                          justifyContent: open ? 'flex-start' : 'center',
+                          px: open ? 2 : 1.5,
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, isActive ? 0.15 : 0.08),
+                            color: theme.palette.primary.main
+                          },
+                          '& .MuiListItemIcon-root': {
+                            color: 'inherit',
+                            minWidth: open ? 40 : 'auto',
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: open ? 40 : 'auto', ml: open ? 0 : -1 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        {open && (
+                          <ListItemText
+                            primary={item.text}
+                            primaryTypographyProps={{
+                              fontWeight: isActive ? 600 : 500,
+                              fontSize: '0.875rem',
+                              letterSpacing: '0.3px'
+                            }}
+                          />
+                        )}
+                      </ListItemButton>
+                    </Tooltip>
+                  )
+                })}
+
+                {sectionIndex < visibleMenuSections.length - 1 && (
+                  <Divider sx={{ my: 0.2, mx: open ? 0.4 : 0.9, opacity: 0.5 }} />
+                )}
+              </React.Fragment>
+            ))}
           </List>
           
           {open && (

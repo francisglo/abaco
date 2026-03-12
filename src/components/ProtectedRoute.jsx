@@ -1,7 +1,7 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { canAccessByRole, getDefaultPathByRole } from '../config/roleAccess'
+import { canAccessByRole, getDefaultPathByRole, normalizeRole } from '../config/roleAccess'
 
 export default function ProtectedRoute({ children, requireAdmin = false, allowedRoles = [] }) {
   const { user, isAuthenticated } = useAuth()
@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children, requireAdmin = false, allowed
     return <Navigate to="/" replace />
   }
 
-  if (requireAdmin && user.role !== 'admin') {
+  if (requireAdmin && normalizeRole(user.role) !== 'admin') {
     return <Navigate to={getDefaultPathByRole(user.role)} replace />
   }
 

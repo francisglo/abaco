@@ -24,8 +24,9 @@ import {
   Divider,
   Alert,
 } from '@mui/material'
-import { fetchGeoFeatures, fetchGeoNearby, fetchGeoSyncStatus, fetchZonesSecure } from '../api'
+import { fetchGeoFeatures, fetchGeoNearby, fetchGeoSyncStatus, fetchZonesSecure, fetchGeo3DModel, fetchGeo3DTileset } from '../api'
 import { useAuth } from '../context/AuthContext'
+import Geo3DViewer from '../components/Geo3DViewer'
 import {
   MdMap,
   MdLayers,
@@ -88,6 +89,10 @@ export default function GeoReferencePage() {
   const [mapCenter, setMapCenter] = useState([-34.6037, -58.3816])
   const [mapZoom, setMapZoom] = useState(12)
   const [message, setMessage] = useState('')
+  const [geo3DModel, setGeo3DModel] = useState(null)
+  const [geo3DTileset, setGeo3DTileset] = useState(null)
+  const [show3DViewer, setShow3DViewer] = useState(false)
+  const [loading3D, setLoading3D] = useState(false)
 
   // Filtros
   const [selectedZone, setSelectedZone] = useState('')
@@ -223,6 +228,22 @@ export default function GeoReferencePage() {
       })
   }
 
+  const extractZoneGeoJson = (features = []) => {
+    const zoneFeatures = features.filter((feature) => {
+      const entityType = String(feature?.properties?.entity_type || '').toLowerCase()
+      const geometryType = String(feature?.geometry?.type || '')
+      return (
+        (entityType === 'zones' || entityType === 'zone') &&
+        (geometryType === 'Polygon' || geometryType === 'MultiPolygon')
+      )
+    })
+
+    return {
+      type: 'FeatureCollection',
+      features: zoneFeatures
+    }
+  }
+
   const loadData = async () => {
     try {
       setLoading(true)
@@ -235,11 +256,12 @@ export default function GeoReferencePage() {
       const zonesData = Array.isArray(zonesRes?.data) ? zonesRes.data : []
       const rawFeatures = Array.isArray(geoRes?.features) ? geoRes.features : []
       const votersData = normalizeVotersFromFeatures(rawFeatures)
+      const zoneGeoJson = extractZoneGeoJson(rawFeatures)
 
       const newData = {
         voters: votersData,
         zones: zonesData,
-        geojson: null,
+        geojson: zoneGeoJson,
       }
 
       setData(newData)
@@ -393,6 +415,38 @@ export default function GeoReferencePage() {
     link.download = `georeferencia_${new Date().toISOString().split('T')[0]}.geojson`
     link.click()
     setMessage('Datos georreferenciados sincronizados exportados')
+  }
+
+  const handleLoad3D = async () => {
+    if (!token) return
+
+    try {
+      setLoading3D(true)
+      const selectedZoneObj = data.zones.find((zone) => zone.name === selectedZone)
+      const zoneId = selectedZoneObj?.id
+      const params = {
+        limit: 2000,
+        types: 'all',
+        ...(zoneId ? { zone_id: zoneId } : {})
+      }
+
+      const [model, tileset] = await Promise.all([
+        fetchGeo3DModel(token, params),
+        fetchGeo3DTileset(token, params)
+      ])
+
+      setGeo3DModel(model)
+      setGeo3DTileset(tileset)
+      setShow3DViewer(true)
+      setMessage('Modelo 3D cargado correctamente')
+    } catch (error) {
+      setMessage(`No se pudo cargar el visor 3D: ${error.message}`)
+      setGeo3DModel(null)
+      setGeo3DTileset(null)
+      setShow3DViewer(false)
+    } finally {
+      setLoading3D(false)
+    }
   }
 
   return (
@@ -576,7 +630,7 @@ export default function GeoReferencePage() {
                       control={
                         <Switch
                           checked={layers.zones}
-                          onChange={(e) => setLayers({ ...layers, zones: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, zones: e.target.checked }))}
                         />
                       }
                       label="Zonas Territoriales"
@@ -584,8 +638,17 @@ export default function GeoReferencePage() {
                     <FormControlLabel
                       control={
                         <Switch
+                          checked={layers.heatmap}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, heatmap: e.target.checked }))}
+                        />
+                      }
+                      label="Mapa de calor (contactos)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
                           checked={layers.priorityAreas}
-                          onChange={(e) => setLayers({ ...layers, priorityAreas: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, priorityAreas: e.target.checked }))}
                         />
                       }
                       label="Áreas Prioritarias"
@@ -594,7 +657,7 @@ export default function GeoReferencePage() {
                       control={
                         <Switch
                           checked={layers.citizenRequests}
-                          onChange={(e) => setLayers({ ...layers, citizenRequests: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, citizenRequests: e.target.checked }))}
                         />
                       }
                       label="Solicitudes Ciudadanas"
@@ -603,7 +666,7 @@ export default function GeoReferencePage() {
                       control={
                         <Switch
                           checked={layers.events}
-                          onChange={(e) => setLayers({ ...layers, events: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, events: e.target.checked }))}
                         />
                       }
                       label="Eventos Territoriales"
@@ -612,7 +675,7 @@ export default function GeoReferencePage() {
                       control={
                         <Switch
                           checked={layers.fieldReports}
-                          onChange={(e) => setLayers({ ...layers, fieldReports: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, fieldReports: e.target.checked }))}
                         />
                       }
                       label="Reportes de Campo"
@@ -621,7 +684,7 @@ export default function GeoReferencePage() {
                       control={
                         <Switch
                           checked={layers.nearby}
-                          onChange={(e) => setLayers({ ...layers, nearby: e.target.checked })}
+                          onChange={(e) => setLayers((prev) => ({ ...prev, nearby: e.target.checked }))}
                         />
                       }
                       label="Análisis de Cercanía"
@@ -710,6 +773,7 @@ export default function GeoReferencePage() {
 
           {/* Mapa principal */}
           <Grid item xs={12} md={9}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.08)', height: 'calc(100vh - 140px)' }}>
               <CardHeader
                 title={`Mapa Territorial - ${filteredVoters.length} contactos + ${citizenRequestPoints.length + eventPoints.length + fieldReportPoints.length} entidades geoespaciales`}
@@ -802,6 +866,25 @@ export default function GeoReferencePage() {
                       )
                     }
                     return null
+                  })}
+
+                  {/* Capa de calor (aproximada con círculos de densidad) */}
+                  {layers.heatmap && filteredVoters.map((voter) => {
+                    const position = [Number(voter.lat), Number(voter.lng)]
+                    const heatColor = getPriorityColor(voter.priority)
+                    return (
+                      <Circle
+                        key={`heat-${voter.id}`}
+                        center={position}
+                        radius={Math.max(120, Math.round(radiusFilter * 0.18))}
+                        pathOptions={{
+                          color: heatColor,
+                          fillColor: heatColor,
+                          fillOpacity: 0.14,
+                          weight: 0
+                        }}
+                      />
+                    )
                   })}
 
                   {/* Capa de áreas prioritarias (círculos) */}
@@ -1093,6 +1176,41 @@ export default function GeoReferencePage() {
                 </MapContainer>
               </Box>
             </Card>
+
+            <Card sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.08)' }}>
+              <CardHeader
+                title="Visualización 3D Territorial"
+                titleTypographyProps={{ variant: 'subtitle1', fontWeight: 600 }}
+                subheader={geo3DTileset?.asset?.version ? `3D Tileset v${geo3DTileset.asset.version}` : 'Carga el modelo generado desde PostGIS'}
+                sx={{ bgcolor: '#f3f4f6', borderBottom: '1px solid rgba(0,0,0,0.08)', py: 1.5 }}
+                action={
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button variant="outlined" size="small" onClick={handleLoad3D} disabled={loading3D}>
+                      {loading3D ? 'Cargando...' : 'Cargar 3D'}
+                    </Button>
+                    {show3DViewer && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setShow3DViewer(false)}
+                      >
+                        Ocultar
+                      </Button>
+                    )}
+                  </Box>
+                }
+              />
+              <CardContent>
+                {show3DViewer && geo3DModel ? (
+                  <Geo3DViewer gltfData={geo3DModel} height={420} />
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    Presiona "Cargar 3D" para visualizar el modelo glTF territorial interactivo.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+            </Box>
           </Grid>
         </Grid>
 

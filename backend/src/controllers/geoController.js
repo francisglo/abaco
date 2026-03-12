@@ -1,6 +1,5 @@
 import database from '../config/database.js';
 import { asyncHandler, AppError } from '../middleware/errorHandler.js';
-import shpwrite from 'shp-write';
 import geobuf from 'geobuf';
 import Pbf from 'pbf';
 
@@ -462,7 +461,7 @@ export const getGeoModelCollection = asyncHandler(async (req, res) => {
 });
 
 export const exportGeoShapefile = asyncHandler(async (req, res) => {
-  const limit = parseLimit(req.query.limit, 500, 5000);
+  const limit = parseLimit(req.query.limit, 500, 3000);
   const zoneId = req.query.zone_id ? parseZoneId(req.query.zone_id) : null;
   const types = parseTypes(req.query.types);
 
@@ -471,6 +470,9 @@ export const exportGeoShapefile = asyncHandler(async (req, res) => {
   if (!featureCollection.features.length) {
     throw new AppError('No hay entidades geoespaciales para exportar', 404, 'NO_GEO_DATA');
   }
+
+  const shpwriteModule = await import('shp-write');
+  const shpwrite = shpwriteModule?.default || shpwriteModule;
 
   const zipArrayBuffer = shpwrite.zip(featureCollection, {
     folder: 'abaco_geo',

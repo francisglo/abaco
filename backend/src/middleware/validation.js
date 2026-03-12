@@ -50,17 +50,20 @@ export const validationSchemas = {
   // ===== USUARIOS =====
   createUser: Joi.object({
     name: Joi.string().min(2).max(100).required(),
-    email: Joi.string().email().required(),
+    username: Joi.string().alphanum().min(3).max(30).optional(),
+    email: Joi.string().email().optional().allow('', null),
     password: Joi.string().min(8).required(),
     role: Joi.string().valid('admin', 'manager', 'operator', 'auditor', 'viewer', 'campaign_manager', 'visitor', 'security_monitor').default('operator'),
     zoneId: Joi.number().integer().positive(),
     phone: Joi.string().pattern(/^[0-9\-\+\s]{10,}$/).optional()
-  }),
+  }).or('email', 'username'),
 
   loginUser: Joi.object({
-    email: Joi.string().email().required(),
+    identifier: Joi.string().min(3).max(120).optional(),
+    email: Joi.string().email().optional(),
+    username: Joi.string().alphanum().min(3).max(30).optional(),
     password: Joi.string().required()
-  }),
+  }).or('identifier', 'email', 'username'),
 
   googleAuth: Joi.object({
     idToken: Joi.string().min(20).required(),
