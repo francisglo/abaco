@@ -20,6 +20,12 @@ export default function AuthPage() {
   const { loginWithGoogle } = useContext(AuthContext)
   const [animatedLogoError, setAnimatedLogoError] = useState(false)
   const [logoError, setLogoError] = useState(false)
+  const [showSplash, setShowSplash] = useState(true);
+    // Splash effect: hide after 2.5s
+    useEffect(() => {
+      const timer = setTimeout(() => setShowSplash(false), 2500);
+      return () => clearTimeout(timer);
+    }, []);
   const [tab, setTab] = useState(0);
   const [error, setError] = useState('');
   const [loginForm, setLoginForm] = useState({
@@ -186,56 +192,98 @@ export default function AuthPage() {
   }, [loginWithGoogle])
 
   return (
-    <Box
-      sx={{
-        '@keyframes floatPulse': {
-          '0%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 },
-          '50%': { transform: 'translateY(-12px) scale(1.04)', opacity: 0.92 },
-          '100%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 }
-        },
-        '@keyframes drift': {
-          '0%': { transform: 'translateX(0px) translateY(0px)' },
-          '50%': { transform: 'translateX(10px) translateY(-8px)' },
-          '100%': { transform: 'translateX(0px) translateY(0px)' }
-        },
-        minHeight: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        p: { xs: 2, md: 3 },
-        bgcolor: 'background.default',
-        position: 'relative',
-        overflow: 'hidden',
-        background: (theme) => `
-          radial-gradient(circle at 12% 18%, ${alpha(theme.palette.primary.main, 0.2)} 0%, transparent 34%),
-          radial-gradient(circle at 88% 82%, ${alpha(theme.palette.secondary.main, 0.2)} 0%, transparent 36%),
-          linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.1)} 0%, ${alpha(theme.palette.background.default, 1)} 45%, ${alpha(theme.palette.secondary.dark, 0.08)} 100%)
-        `,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: '-80px',
-          left: '-60px',
-          width: 220,
-          height: 220,
-          borderRadius: '50%',
-          background: (theme) => alpha(theme.palette.primary.main, 0.18),
-          filter: 'blur(10px)',
-          animation: 'floatPulse 7s ease-in-out infinite'
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          right: '-70px',
-          bottom: '-70px',
-          width: 260,
-          height: 260,
-          borderRadius: '50%',
-          background: (theme) => alpha(theme.palette.secondary.main, 0.14),
-          filter: 'blur(14px)',
-          animation: 'drift 8s ease-in-out infinite'
-        }
-      }}
-    >
+    <>
+      {showSplash && (
+        <Box
+          sx={{
+            position: 'fixed',
+            zIndex: 2000,
+            inset: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: '#0a0a0f',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'opacity 0.7s',
+            animation: 'fadeSplash 2.5s cubic-bezier(0.4,0,0.2,1)',
+            '@keyframes fadeSplash': {
+              '0%': { opacity: 1 },
+              '80%': { opacity: 1 },
+              '100%': { opacity: 0 }
+            }
+          }}
+        >
+          <Box
+            component="img"
+            src={"/TFG/TFG.GIF"}
+            alt="ÁBACO splash"
+            sx={{
+              width: { xs: 180, md: 260 },
+              filter: 'drop-shadow(0 0 32px #00eaff88)',
+              borderRadius: 3,
+              animation: 'splashLogoPop 1.8s cubic-bezier(0.4,0,0.2,1)',
+              '@keyframes splashLogoPop': {
+                '0%': { opacity: 0, transform: 'scale(0.7)' },
+                '40%': { opacity: 1, transform: 'scale(1.08)' },
+                '70%': { opacity: 1, transform: 'scale(0.98)' },
+                '100%': { opacity: 1, transform: 'scale(1)' }
+              }
+            }}
+          />
+        </Box>
+      )}
+      {!showSplash && (
+        <Box
+          sx={{
+            '@keyframes floatPulse': {
+              '0%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 },
+              '50%': { transform: 'translateY(-12px) scale(1.04)', opacity: 0.92 },
+              '100%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 }
+            },
+            '@keyframes drift': {
+              '0%': { transform: 'translateX(0px) translateY(0px)' },
+              '50%': { transform: 'translateX(10px) translateY(-8px)' },
+              '100%': { transform: 'translateX(0px) translateY(0px)' }
+            },
+            minHeight: '100vh',
+            display: 'grid',
+            placeItems: 'center',
+            p: { xs: 2, md: 3 },
+            bgcolor: 'background.default',
+            position: 'relative',
+            overflow: 'hidden',
+            background: (theme) => `
+              radial-gradient(circle at 12% 18%, ${alpha(theme.palette.primary.main, 0.2)} 0%, transparent 34%),
+              radial-gradient(circle at 88% 82%, ${alpha(theme.palette.secondary.main, 0.2)} 0%, transparent 36%),
+              linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.1)} 0%, ${alpha(theme.palette.background.default, 1)} 45%, ${alpha(theme.palette.secondary.dark, 0.08)} 100%)
+            `,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: '-80px',
+              left: '-60px',
+              width: 220,
+              height: 220,
+              borderRadius: '50%',
+              background: (theme) => alpha(theme.palette.primary.main, 0.18),
+              filter: 'blur(10px)',
+              animation: 'floatPulse 7s ease-in-out infinite'
+            },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              right: '-70px',
+              bottom: '-70px',
+              width: 260,
+              height: 260,
+              borderRadius: '50%',
+              background: (theme) => alpha(theme.palette.secondary.main, 0.14),
+              filter: 'blur(14px)',
+              animation: 'drift 8s ease-in-out infinite'
+            }
+          }}
+        >
       <Grow in timeout={560}>
         <Card
           sx={{
