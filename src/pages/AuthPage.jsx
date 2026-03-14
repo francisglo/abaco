@@ -29,6 +29,11 @@ export default function AuthPage() {
     }, []);
   const [tab, setTab] = useState(0);
   const [showKID, setShowKID] = useState(false);
+  // Nuevo: mostrar selector de método desde la pantalla principal
+  const handleShowKID = () => {
+    setShowKID(true);
+    setTab(2); // Nuevo tab para KID
+  };
   const [error, setError] = useState('');
   const [loginForm, setLoginForm] = useState({
     identifier: '',
@@ -420,22 +425,21 @@ export default function AuthPage() {
           <CardContent sx={{ flex: 1, p: { xs: 2.5, md: 4 } }}>
             <Stack spacing={2.25}>
               <Typography variant="h5" fontWeight={700}>
-                {tab === 0 ? 'Iniciar sesión' : (showKID ? 'Crear cuenta con KID — Key Identity' : 'Crear cuenta')}
+                {tab === 0 ? 'Iniciar sesión' : tab === 1 ? 'Crear cuenta' : 'KiD (Key Identity)'}
               </Typography>
-              {tab === 1 && !showKID && (
-                <>
-                  <Button variant="contained" fullWidth sx={{ my: 1, fontWeight: 700 }} onClick={() => setShowKID(false)}>
-                    Crear cuenta con Email
+              {/* Botones principales de acceso */}
+              {tab === 0 && !showKID && (
+                <Stack spacing={1.5} direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 2 }}>
+                  <Button variant="contained" fullWidth sx={{ fontWeight: 700 }} onClick={() => { setTab(0); setShowKID(false); }}>
+                    Iniciar sesión
                   </Button>
-                  <Box sx={{ display: 'flex', alignItems: 'center', my: 1 }}>
-                    <Divider sx={{ flex: 1 }} />
-                    <Typography sx={{ mx: 2, color: 'text.secondary', fontWeight: 600 }}>o</Typography>
-                    <Divider sx={{ flex: 1 }} />
-                  </Box>
-                  <Button variant="outlined" color="secondary" fullWidth sx={{ fontWeight: 700 }} onClick={() => setShowKID(true)}>
-                    Crear cuenta con KID — Key Identity
+                  <Button variant="outlined" fullWidth sx={{ fontWeight: 700 }} onClick={() => { setTab(1); setShowKID(false); }}>
+                    Crear cuenta
                   </Button>
-                </>
+                  <Button variant="outlined" color="secondary" fullWidth sx={{ fontWeight: 700 }} onClick={handleShowKID}>
+                    Iniciar sesión / Crear cuenta con KiD
+                  </Button>
+                </Stack>
               )}
               {/* Selector de método SINE */}
               <Box sx={{ my: 1 }}>
@@ -456,7 +460,7 @@ export default function AuthPage() {
                   <ToggleButton value="pattern">Patrón</ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {tab === 0 ? (
+              {tab === 0 && !showKID ? (
                 <form onSubmit={onSubmitLogin}>
                   <Stack spacing={2}>
                     <TextField
@@ -525,7 +529,7 @@ export default function AuthPage() {
                     Entrar
                   </Button>
                 </form>
-              ) : showKID ? (
+              ) : tab === 2 || showKID ? (
                 <form onSubmit={onSubmitRegister}>
                   <Stack spacing={2}>
                     <TextField label="Usuario" value={registerForm.username} onChange={onChangeRegister('username')} fullWidth />
