@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
+import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext'
 import { getGoogleClientId } from '../utils/env'
 import abacoLogo from '../../TFG/TFG.png';
@@ -27,13 +28,8 @@ export default function AuthPage() {
       const timer = setTimeout(() => setShowSplash(false), 2500);
       return () => clearTimeout(timer);
     }, []);
-  const [tab, setTab] = useState(0);
-  const [showKID, setShowKID] = useState(false);
-  // Nuevo: mostrar selector de método desde la pantalla principal
-  const handleShowKID = () => {
-    setShowKID(true);
-    setTab(2); // Nuevo tab para KID
-  };
+  // 0: pantalla principal, 1: login, 2: registro, 3: KyD
+  const [screen, setScreen] = useState(0);
   const [error, setError] = useState('');
   const [loginForm, setLoginForm] = useState({
     identifier: '',
@@ -268,179 +264,123 @@ export default function AuthPage() {
       {!showSplash && (
         <Box
           sx={{
-            '@keyframes floatPulse': {
-              '0%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 },
-              '50%': { transform: 'translateY(-12px) scale(1.04)', opacity: 0.92 },
-              '100%': { transform: 'translateY(0px) scale(1)', opacity: 0.65 }
-            },
-            '@keyframes drift': {
-              '0%': { transform: 'translateX(0px) translateY(0px)' },
-              '50%': { transform: 'translateX(10px) translateY(-8px)' },
-              '100%': { transform: 'translateX(0px) translateY(0px)' }
-            },
             minHeight: '100vh',
-            display: 'grid',
-            placeItems: 'center',
-            p: { xs: 2, md: 3 },
-            bgcolor: 'background.default',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: '#0A0A0A',
             position: 'relative',
             overflow: 'hidden',
-            background: (theme) => `
-              radial-gradient(circle at 12% 18%, ${alpha(theme.palette.primary.main, 0.2)} 0%, transparent 34%),
-              radial-gradient(circle at 88% 82%, ${alpha(theme.palette.secondary.main, 0.2)} 0%, transparent 36%),
-              linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.1)} 0%, ${alpha(theme.palette.background.default, 1)} 45%, ${alpha(theme.palette.secondary.dark, 0.08)} 100%)
-            `,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: '-80px',
-              left: '-60px',
-              width: 220,
-              height: 220,
-              borderRadius: '50%',
-              background: (theme) => alpha(theme.palette.primary.main, 0.18),
-              filter: 'blur(10px)',
-              animation: 'floatPulse 7s ease-in-out infinite'
-            },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              right: '-70px',
-              bottom: '-70px',
-              width: 260,
-              height: 260,
-              borderRadius: '50%',
-              background: (theme) => alpha(theme.palette.secondary.main, 0.14),
-              filter: 'blur(14px)',
-              animation: 'drift 8s ease-in-out infinite'
-            }
           }}
         >
-      <Grow in timeout={560}>
-        <Card
-          sx={{
-            width: '100%',
-            maxWidth: 920,
-            borderRadius: 3,
-            overflow: 'hidden',
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
-            boxShadow: (theme) => `0 20px 40px ${alpha(theme.palette.primary.main, 0.2)}`,
-            position: 'relative',
-            zIndex: 2,
-            transition: 'transform 280ms ease, box-shadow 280ms ease',
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              boxShadow: (theme) => `0 24px 48px ${alpha(theme.palette.primary.main, 0.26)}`
-            }
-          }}
-        >
-        <Stack direction={{ xs: 'column', md: 'row' }}>
-          <Paper
-            square
-            elevation={0}
-            sx={{
-              width: { xs: '100%', md: '42%' },
-              p: { xs: 3, md: 4 },
-              color: 'primary.contrastText',
-              background: (theme) => `linear-gradient(155deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 52%, ${theme.palette.secondary.main} 100%)`,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                top: 18,
-                right: 18,
-                width: 120,
-                height: 120,
-                borderRadius: '50%',
-                background: (theme) => alpha(theme.palette.common.white, 0.08),
-                filter: 'blur(1px)',
-                animation: 'floatPulse 6s ease-in-out infinite'
-              }
-            }}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            style={{ width: '100%', maxWidth: 400 }}
           >
-            <Stack spacing={2.5}>
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
               <Box
-                sx={{ width: { xs: 148, md: 180 }, maxWidth: '100%' }}
-              >
-                {!animatedLogoError ? (
-                  <Box
-                    component="img"
-                    src={"/TFG/TFG.GIF"}
-                    alt="ÁBACO dinámico"
-                    onError={() => setAnimatedLogoError(true)}
-                    sx={{
-                      width: '100%',
-                      borderRadius: 2,
-                      border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
-                      bgcolor: (theme) => alpha(theme.palette.common.white, 0.1),
-                      p: 0.6
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: '100%',
-                      borderRadius: 2,
-                      border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
-                      bgcolor: (theme) => alpha(theme.palette.common.white, 0.12),
-                      p: 1.2,
-                      textAlign: 'center',
-                      fontWeight: 800,
-                      letterSpacing: 1.2
-                    }}
-                  >
-                    ÁBACO
-                  </Box>
-                )}
-              </Box>
-              <Avatar
-                src={logoError ? undefined : abacoLogo}
-                imgProps={{ onError: () => setLogoError(true) }}
-                sx={{
-                  width: 52,
-                  height: 52,
-                  bgcolor: (theme) => alpha(theme.palette.common.white, 0.2),
-                  border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.35)}`,
-                  animation: 'drift 4.2s ease-in-out infinite'
-                }}
-              >
-                <MdLockOutline size={28} />
-              </Avatar>
-              <Typography variant="h4" fontWeight={800} lineHeight={1.2}>
-                Bienvenido a ÁBACO
+                component="img"
+                src={"/TFG/TFG.GIF"}
+                alt="ÁBACO"
+                sx={{ width: 120, mx: 'auto', mb: 2, borderRadius: 2, boxShadow: '0 0 24px #00eaff33' }}
+              />
+              <Typography variant="h3" fontWeight={900} color="#fff" letterSpacing={2} sx={{ mb: 0.5, fontFamily: 'Montserrat, sans-serif' }}>
+                ÁBACO
               </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                Accede de forma segura para gestionar campañas, equipos y datos territoriales.
+              <Typography variant="subtitle1" color="#fff" sx={{ opacity: 0.7, fontWeight: 500, letterSpacing: 1, mb: 2 }}>
+                Plataforma Electoral
               </Typography>
-              <Divider sx={{ borderColor: (theme) => alpha(theme.palette.common.white, 0.28) }} />
-              <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                Si aún no tienes cuenta, puedes crearla en segundos desde esta misma pantalla.
-              </Typography>
-            </Stack>
-          </Paper>
-
-          <CardContent sx={{ flex: 1, p: { xs: 2.5, md: 4 } }}>
-            <Stack spacing={2.25}>
-              <Typography variant="h5" fontWeight={700}>
-                {tab === 0 ? 'Iniciar sesión' : tab === 1 ? 'Crear cuenta' : 'KiD (Key Identity)'}
-              </Typography>
-              {/* Botones principales de acceso */}
-              {tab === 0 && !showKID && (
-                <Stack spacing={1.5} direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 2 }}>
-                  <Button variant="contained" fullWidth sx={{ fontWeight: 700 }} onClick={() => { setTab(0); setShowKID(false); }}>
-                    Iniciar sesión
-                  </Button>
-                  <Button variant="outlined" fullWidth sx={{ fontWeight: 700 }} onClick={() => { setTab(1); setShowKID(false); }}>
-                    Crear cuenta
-                  </Button>
-                  <Button variant="outlined" color="secondary" fullWidth sx={{ fontWeight: 700 }} onClick={handleShowKID}>
-                    Iniciar sesión / Crear cuenta con KiD
-                  </Button>
-                </Stack>
+            </Box>
+            <AnimatePresence mode="wait">
+              {screen === 0 && (
+                <motion.div
+                  key="main"
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -40 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Stack spacing={2}>
+                    <Button variant="contained" size="large" fullWidth sx={{ fontWeight: 800, fontSize: 18, py: 1.5, bgcolor: '#fff', color: '#0A0A0A', borderRadius: 2, boxShadow: '0 2px 16px #fff2', letterSpacing: 2, '&:hover': { bgcolor: '#eaeaea', color: '#000' } }} onClick={() => setScreen(1)}>
+                      INICIAR SESIÓN
+                    </Button>
+                    <Button variant="outlined" size="large" fullWidth sx={{ fontWeight: 700, fontSize: 17, py: 1.5, borderColor: '#fff', color: '#fff', borderRadius: 2, letterSpacing: 2, '&:hover': { bgcolor: '#fff', color: '#000' } }} onClick={() => setScreen(2)}>
+                      CREAR CUENTA
+                    </Button>
+                    <Divider sx={{ my: 1, borderColor: '#2A2A2A', color: '#fff', fontWeight: 600 }}>o</Divider>
+                    <Button variant="outlined" size="large" fullWidth sx={{ fontWeight: 700, fontSize: 17, py: 1.5, borderColor: '#00eaff', color: '#00eaff', borderRadius: 2, letterSpacing: 2, '&:hover': { bgcolor: '#00eaff', color: '#000' } }} onClick={() => setScreen(3)}>
+                      ACCEDER CON KYD
+                    </Button>
+                    <Typography variant="caption" color="#00eaff" sx={{ mt: 1, letterSpacing: 1, fontWeight: 600 }}>
+                      Identidad digital segura
+                    </Typography>
+                  </Stack>
+                </motion.div>
               )}
+              {screen === 1 && (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -60 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {/* ... Formulario de login clásico ... */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h5" color="#fff" fontWeight={700} sx={{ mb: 2 }}>Iniciar sesión</Typography>
+                    {/* ...existing code for login form... */}
+                  </Box>
+                  {/* Aquí puedes insertar el formulario clásico de login */}
+                  {/* ... */}
+                  <Button fullWidth sx={{ mt: 2, color: '#fff', borderColor: '#fff' }} onClick={() => setScreen(0)}>
+                    Volver
+                  </Button>
+                </motion.div>
+              )}
+              {screen === 2 && (
+                <motion.div
+                  key="register"
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -60 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h5" color="#fff" fontWeight={700} sx={{ mb: 2 }}>Crear cuenta</Typography>
+                    {/* ...existing code for registro clásico... */}
+                  </Box>
+                  {/* Aquí puedes insertar el formulario clásico de registro */}
+                  {/* ... */}
+                  <Button fullWidth sx={{ mt: 2, color: '#fff', borderColor: '#fff' }} onClick={() => setScreen(0)}>
+                    Volver
+                  </Button>
+                </motion.div>
+              )}
+              {screen === 3 && (
+                <motion.div
+                  key="kyd"
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -60 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h5" color="#00eaff" fontWeight={800} sx={{ mb: 2 }}>Acceder con KyD</Typography>
+                    {/* ...existing code for KyD login/registro... */}
+                  </Box>
+                  {/* Aquí puedes insertar el formulario KyD (PIN/patrón) */}
+                  {/* ... */}
+                  <Button fullWidth sx={{ mt: 2, color: '#00eaff', borderColor: '#00eaff' }} onClick={() => setScreen(0)}>
+                    Volver
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </Box>
+      )}
               {/* Selector de método SINE */}
               <Box sx={{ my: 1 }}>
                 <ToggleButtonGroup
