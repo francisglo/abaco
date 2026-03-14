@@ -153,6 +153,15 @@ export default function Layout({ children }) {
       items: [
         { text: 'Panel de Administración', icon: <MdSettings size={20} />, path: '/abaco-administracion', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
       ]
+    },
+    {
+      title: 'Coworking',
+      items: [
+        { text: 'Coworking', icon: <MdConnectWithoutContact size={20} />, path: '/coworking', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Mensajes', icon: <MdPeople size={20} />, path: '/coworking/messages', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Grupos', icon: <MdPeople size={20} />, path: '/coworking/groups', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Eventos', icon: <MdEmojiEvents size={20} />, path: '/coworking/events', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] }
+      ]
     }
   ]
 

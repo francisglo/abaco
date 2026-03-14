@@ -29,6 +29,7 @@ import { TbShieldLock } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getDefaultPathByRole } from '../config/roleAccess'
+import CoworkingPortfolio from '../components/CoworkingPortfolio'
 
 function toDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -203,7 +204,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 760, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, md: 4 } }}>
       <Card>
         <Box
           sx={{
@@ -558,6 +559,7 @@ export default function ProfilePage() {
           </Stack>
         </CardContent>
       </Card>
+      <CoworkingPortfolio />
     </Box>
   )
 }

@@ -49,6 +49,10 @@ const AbacoVerticalsSectionPage = lazy(() => import('./pages/AbacoVerticalsSecti
 const AbacoVerticalDetailPage = lazy(() => import('./pages/AbacoVerticalDetailPage'))
 const AbacoIntegratedBiPage = lazy(() => import('./pages/AbacoIntegratedBiPage'))
 const OperationalAlgorithmsPage = lazy(() => import('./pages/OperationalAlgorithmsPage'))
+const CoworkingPage = lazy(() => import('./pages/CoworkingPage'))
+const CoworkingMessagesPage = lazy(() => import('./pages/CoworkingMessagesPage'))
+const CoworkingGroupsPage = lazy(() => import('./pages/CoworkingGroupsPage'))
+const CoworkingEventsPage = lazy(() => import('./pages/CoworkingEventsPage'))
 
 // Dashboards funcionales de módulos principales
 const ElectoralDashboard = lazy(() => import('./pages/ElectoralDashboard'))
@@ -145,6 +149,10 @@ export default function App() {
                 <Route path="/abaco-verticales/inclusion-financiera/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><InclusionFinancieraDashboard /></ProtectedRoute>} />
                 <Route path="/abaco-verticales/cooperacion-desarrollo/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><CooperacionDesarrolloDashboard /></ProtectedRoute>} />
                 <Route path="/abaco-verticales/ordenamiento-territorial-planeacion-urbana/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><OrdenamientoTerritorialDashboard /></ProtectedRoute>} />
+                <Route path="/coworking" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><CoworkingPage /></ProtectedRoute>} />
+                <Route path="/coworking/messages" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><CoworkingMessagesPage /></ProtectedRoute>} />
+                <Route path="/coworking/groups" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><CoworkingGroupsPage /></ProtectedRoute>} />
+                <Route path="/coworking/events" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor']}><CoworkingEventsPage /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to={roleHome} replace />} />
               </Routes>
             </Suspense>
