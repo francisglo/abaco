@@ -1,3 +1,4 @@
+export { AuthContext }
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import {
   loginAuth,
@@ -12,7 +13,7 @@ const AuthContext = createContext()
 const TOKEN_KEY = 'abaco_auth_token'
 const LOCAL_USERS_KEY = 'abaco_local_users'
 const LOCAL_TOKEN_PREFIX = 'local:'
-const AUTH_ALLOW_LOCAL_FALLBACK = String(import.meta.env.VITE_AUTH_ALLOW_LOCAL_FALLBACK || '').toLowerCase() === 'true'
+const AUTH_ALLOW_LOCAL_FALLBACK = String(process.env.VITE_AUTH_ALLOW_LOCAL_FALLBACK || '').toLowerCase() === 'true'
 
 function isNetworkAuthError(error) {
   const msg = String(error?.message || '').toLowerCase()

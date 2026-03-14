@@ -1,4 +1,4 @@
-const normalizedApiBase = String(import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '')
+const normalizedApiBase = String(process.env.VITE_API_URL || '').trim().replace(/\/$/, '')
 const API_BASE = normalizedApiBase || 'http://localhost:4000'
 const API_V1 = `${API_BASE}/api/v1`
 

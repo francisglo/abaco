@@ -57,7 +57,7 @@ async function ensureUniqueEmail(baseSeed) {
  * POST /api/auth/register
  */
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, username, password, role = 'operator', phone, zoneId } = req.body;
+  const { name, email, username, password, pin, pattern, role = 'operator', phone, zoneId } = req.body;
   const normalizedEmail = String(email || '').trim().toLowerCase();
   const normalizedUsernameRaw = sanitizeUsername(username || normalizedEmail.split('@')[0] || name);
   const normalizedUsername = await ensureUniqueUsername(normalizedUsernameRaw || `user${Date.now()}`);
@@ -83,8 +83,16 @@ export const register = asyncHandler(async (req, res) => {
     throw new AppError('Nombre de usuario ya registrado', 409, 'USERNAME_EXISTS');
   }
 
-  // Hashear contraseña
+  // Hashear contraseña, PIN y patrón si se proveen
   const passwordHash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 10);
+  let pinHash = null;
+  let patternHash = null;
+  if (pin) {
+    pinHash = await bcrypt.hash(pin, parseInt(process.env.BCRYPT_ROUNDS) || 10);
+  }
+  if (pattern) {
+    patternHash = await bcrypt.hash(pattern, parseInt(process.env.BCRYPT_ROUNDS) || 10);
+  }
 
   // Insertar usuario
   const user = await database.insert('users', {
@@ -92,6 +100,8 @@ export const register = asyncHandler(async (req, res) => {
     email: effectiveEmail,
     username: normalizedUsername,
     password_hash: passwordHash,
+    pin_hash: pinHash,
+    pattern_hash: patternHash,
     role,
     phone,
     zone_id: zoneId,
@@ -125,7 +135,7 @@ export const register = asyncHandler(async (req, res) => {
  * POST /api/auth/login
  */
 export const login = asyncHandler(async (req, res) => {
-  const { email, username, identifier, password } = req.body;
+  const { email, username, identifier, password, pin, pattern } = req.body;
   const rawIdentifier = String(identifier || email || username || '').trim();
   const normalizedIdentifier = rawIdentifier.toLowerCase();
 
@@ -133,27 +143,39 @@ export const login = asyncHandler(async (req, res) => {
     throw new AppError('Debes indicar email o username', 400, 'AUTH_IDENTIFIER_REQUIRED');
   }
 
-  // Buscar usuario
+  // Buscar usuario (ahora también obtenemos pin_hash y pattern_hash)
   const user = await database.queryOne(
-    `SELECT id, name, email, username, role, password_hash, active
+    `SELECT id, name, email, username, role, password_hash, pin_hash, pattern_hash, active
      FROM users
      WHERE LOWER(email) = $1 OR LOWER(username) = $1`,
     [normalizedIdentifier]
   );
 
   if (!user) {
-    throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
+    throw new AppError('Credenciales incorrectas', 401, 'INVALID_CREDENTIALS');
   }
 
   if (!user.active) {
     throw new AppError('Usuario desactivado', 403, 'USER_INACTIVE');
   }
 
-  // Verificar contraseña
-  const passwordMatch = await bcrypt.compare(password, user.password_hash);
+  // Permitir login por password, pin o pattern
+  let valid = false;
+  if (password && user.password_hash) {
+    valid = await bcrypt.compare(password, user.password_hash);
+  } else if (pin && user.pin_hash) {
+    valid = await bcrypt.compare(pin, user.pin_hash);
+  } else if (pattern && user.pattern_hash) {
+    valid = await bcrypt.compare(pattern, user.pattern_hash);
+  }
 
-  if (!passwordMatch) {
-    throw new AppError('Email o contraseña incorrectos', 401, 'INVALID_CREDENTIALS');
+  // Si no se envió ningún método válido
+  if (!(password || pin || pattern)) {
+    throw new AppError('Debes indicar contraseña, PIN o patrón', 400, 'AUTH_METHOD_REQUIRED');
+  }
+
+  if (!valid) {
+    throw new AppError('Credenciales incorrectas', 401, 'INVALID_CREDENTIALS');
   }
 
   // Generar token

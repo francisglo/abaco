@@ -129,6 +129,10 @@ const verticalContent = {
 }
 
 export default function AbacoVerticalDetailPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const navigate = useNavigate()
   const { slug } = useParams()

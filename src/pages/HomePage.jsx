@@ -17,8 +17,13 @@ import {
   MdSpeed
 } from 'react-icons/md'
 import { RiContactsBook2Fill } from 'react-icons/ri'
+import { Tooltip } from '@mui/material'
 
 export default function HomePage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const navigate = useNavigate()
   const theme = useTheme()
 
@@ -197,88 +202,132 @@ export default function HomePage() {
       {/* Hero Section */}
       <Box
         sx={{
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.08)} 100%)`,
-          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          py: 8,
-          mb: 6
+          position: 'relative',
+          minHeight: { xs: 380, sm: 520, md: 600 },
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          mb: { xs: 3, sm: 6 },
         }}
       >
-        <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography
-                variant="h2"
-                sx={{
-                  fontWeight: 700,
-                  color: theme.palette.primary.main,
-                  mb: 2,
-                  letterSpacing: '-0.02em'
-                }}
-              >
-                ÁBACO
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  color: theme.palette.text.secondary,
-                  mb: 3,
-                  fontWeight: 500,
-                  lineHeight: 1.6
-                }}
-              >
-                Plataforma integral de gestión territorial y análisis de contactos con capacidades avanzadas de mapeo y coordinación operativa.
-              </Typography>
-              <Stack direction="row" spacing={2}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  endIcon={<MdArrowForward />}
-                  onClick={() => navigate('/portales')}
+        {/* Imagen de fondo tipo SpaceX */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: 'url(https://sxcontent9668.azureedge.us/cms-assets/assets/SLC_4_E_600x600_24dd9e969c.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.45) grayscale(0.2)',
+            zIndex: 1,
+            transition: 'filter 0.4s',
+          }}
+        />
+        {/* Overlay oscuro */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            bgcolor: 'rgba(10,10,10,0.72)',
+            zIndex: 2,
+          }}
+        />
+        {/* Contenido hero */}
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3 }}>
+          <Grid container spacing={0} alignItems="center" justifyContent="center">
+            <Grid item xs={12} md={8}>
+              <Box sx={{ textAlign: 'center', py: { xs: 7, sm: 10 } }}>
+                <Typography
+                  variant={useMediaQuery(theme.breakpoints.down('sm')) ? 'h3' : 'h1'}
                   sx={{
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #0f1f3a 100%)`,
-                    '&:hover': {
-                      boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.3)}`
-                    }
+                    fontWeight: 900,
+                    color: '#fff',
+                    mb: 3,
+                    letterSpacing: '-0.03em',
+                    fontSize: { xs: '2.2rem', sm: '3.2rem', md: '4.2rem' },
+                    textShadow: '0 4px 32px rgba(0,0,0,0.38)',
+                    lineHeight: 1.13,
+                    textTransform: 'uppercase',
+                  }}
+                  tabIndex={0}
+                  aria-label="ÁBACO plataforma territorial"
+                >
+                  ÁBACO
+                </Typography>
+                <Typography
+                  variant={useMediaQuery(theme.breakpoints.down('sm')) ? 'body1' : 'h5'}
+                  sx={{
+                    color: 'rgba(255,255,255,0.92)',
+                    mb: 4,
+                    fontWeight: 500,
+                    lineHeight: 1.5,
+                    fontSize: { xs: '1.1rem', sm: '1.35rem', md: '1.6rem' },
+                    textShadow: '0 2px 16px rgba(0,0,0,0.32)'
                   }}
                 >
-                  Explorar portales
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => navigate('/dashboard')}
-                  sx={{
-                    borderColor: theme.palette.primary.main,
-                    color: theme.palette.primary.main,
-                    '&:hover': {
-                      bgcolor: alpha(theme.palette.primary.main, 0.04),
-                      borderColor: theme.palette.primary.main
-                    }
-                  }}
-                >
-                  Ir al dashboard
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`,
-                  borderRadius: '16px',
-                  p: 4,
-                  textAlign: 'center',
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-                }}
-              >
-                <Box sx={{ fontSize: '4rem', mb: 2, color: theme.palette.secondary.main }}>
-                  <MdTrendingUp style={{ width: '100%', height: 'auto' }} />
-                </Box>
-                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
-                  Sistema Operativo
+                  Plataforma integral de gestión territorial y análisis de contactos con capacidades avanzadas de mapeo y coordinación operativa.
                 </Typography>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, opacity: 0.7, mt: 1 }}>
-                  Todos los módulos listos para producción
-                </Typography>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+                  <Tooltip title="Explora los portales institucionales y verticales de la plataforma" arrow>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      endIcon={<MdArrowForward />}
+                      onClick={() => navigate('/portales')}
+                      sx={{
+                        background: 'rgba(255,255,255,0.08)',
+                        color: '#fff',
+                        fontWeight: 700,
+                        px: 4,
+                        fontSize: '1.1rem',
+                        borderRadius: 3,
+                        boxShadow: '0 4px 24px 0 rgba(0,0,0,0.18)',
+                        backdropFilter: 'blur(2px)',
+                        letterSpacing: '0.04em',
+                        '&:hover': {
+                          background: 'rgba(255,255,255,0.18)',
+                          color: '#fff',
+                          boxShadow: '0 8px 32px 0 rgba(0,0,0,0.28)'
+                        },
+                        transition: 'all 0.2s',
+                      }}
+                      aria-label="Explorar portales"
+                    >
+                      Explorar portales
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Ir al dashboard ejecutivo de la plataforma" arrow>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => navigate('/dashboard')}
+                      sx={{
+                        borderColor: 'rgba(255,255,255,0.7)',
+                        color: '#fff',
+                        fontWeight: 700,
+                        px: 4,
+                        fontSize: '1.1rem',
+                        borderRadius: 3,
+                        letterSpacing: '0.04em',
+                        '&:hover': {
+                          bgcolor: 'rgba(255,255,255,0.12)',
+                          borderColor: '#fff',
+                          color: '#fff',
+                        },
+                        transition: 'all 0.2s',
+                      }}
+                      aria-label="Ir al dashboard"
+                    >
+                      Ir al dashboard
+                    </Button>
+                  </Tooltip>
+                </Stack>
               </Box>
             </Grid>
           </Grid>
@@ -286,13 +335,16 @@ export default function HomePage() {
       </Box>
 
       <Container maxWidth="lg" sx={{ mb: 7 }}>
-        <Box sx={{ mb: 3.5 }}>
+        <Box sx={{ mb: 3.5, textAlign: 'center' }}>
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 700,
-              color: theme.palette.primary.main,
-              mb: 1
+              fontWeight: 800,
+              color: '#fff',
+              mb: 1,
+              letterSpacing: '0.01em',
+              textTransform: 'uppercase',
+              fontSize: { xs: '1.5rem', sm: '2.1rem' }
             }}
           >
             Acceso por portales
@@ -300,15 +352,17 @@ export default function HomePage() {
           <Typography
             variant="body1"
             sx={{
-              color: theme.palette.text.secondary,
-              opacity: 0.85
+              color: 'rgba(255,255,255,0.82)',
+              opacity: 0.92,
+              fontWeight: 400,
+              fontSize: { xs: '1rem', sm: '1.18rem' }
             }}
           >
             Accede más rápido a cada sección sin acumular toda la navegación en un único bloque.
           </Typography>
         </Box>
 
-        <Grid container spacing={2.5}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           {[
             { title: 'Portal Operativo', path: '/portales', label: 'Territorio y ejecución' },
             { title: 'Portal Inteligencia', path: '/portales', label: 'Análisis y estrategia' },
@@ -320,20 +374,29 @@ export default function HomePage() {
                 onClick={() => navigate(portal.path)}
                 sx={{
                   cursor: 'pointer',
-                  borderRadius: 2.5,
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
-                  transition: 'all 0.2s ease',
+                  borderRadius: 3,
+                  border: 'none',
+                  background: 'rgba(24,28,36,0.92)',
+                  color: '#fff',
+                  minHeight: 140,
+                  boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
-                    boxShadow: `0 10px 24px ${alpha(theme.palette.primary.main, 0.1)}`
+                    background: 'rgba(40,44,56,0.98)',
+                    boxShadow: '0 8px 40px 0 rgba(0,0,0,0.28)',
+                    transform: 'translateY(-4px) scale(1.03)'
                   }
                 }}
               >
-                <CardContent>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff', fontSize: '1.18rem', letterSpacing: '0.01em' }}>
                     {portal.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', mt: 0.5, fontWeight: 400 }}>
                     {portal.label}
                   </Typography>
                 </CardContent>
@@ -367,48 +430,63 @@ export default function HomePage() {
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           {modules.map((module, index) => (
-            <Grid item xs={12} sm={6} md={6} lg={3} key={index}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
               <Card
+                role="region"
+                aria-label={`Módulo ${module.title}`}
+                tabIndex={0}
                 sx={{
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  border: `1px solid ${alpha(module.color, 0.2)}`,
+                  background: 'rgba(24,28,36,0.92)',
+                  color: '#fff',
+                  borderRadius: 3,
+                  border: 'none',
+                  boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
                   cursor: 'pointer',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: `0 20px 40px ${alpha(module.color, 0.15)}`,
-                    borderColor: module.color
+                  outline: 'none',
+                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover, &:focus': {
+                    background: 'rgba(40,44,56,0.98)',
+                    boxShadow: '0 8px 40px 0 rgba(0,0,0,0.28)',
+                    transform: 'translateY(-4px) scale(1.03)'
                   }
                 }}
                 onClick={() => navigate(module.path)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate(module.path) }}
               >
-                <CardContent sx={{ flex: 1, pb: 2 }}>
-                  <Box
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: '12px',
-                      background: alpha(module.color, 0.1),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 2,
-                      color: module.color,
-                      transition: 'all 0.3s'
-                    }}
-                  >
-                    {module.icon}
-                  </Box>
+                <CardContent sx={{ flex: 1, pb: 2, textAlign: 'center' }}>
+                  <Tooltip title={module.title + ': ' + module.description} arrow>
+                    <Box
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.06)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb: 2,
+                        color: module.color,
+                        fontSize: 36,
+                        boxShadow: '0 2px 12px 0 rgba(0,0,0,0.18)'
+                      }}
+                      aria-label={`Icono de ${module.title}`}
+                    >
+                      {module.icon}
+                    </Box>
+                  </Tooltip>
                   <Typography
                     variant="h6"
                     sx={{
                       fontWeight: 700,
-                      color: theme.palette.primary.main,
-                      mb: 1
+                      color: '#fff',
+                      mb: 1,
+                      fontSize: '1.18rem',
+                      letterSpacing: '0.01em'
                     }}
                   >
                     {module.title}
@@ -416,9 +494,10 @@ export default function HomePage() {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: theme.palette.text.secondary,
+                      color: 'rgba(255,255,255,0.82)',
                       lineHeight: 1.6,
-                      mb: 2
+                      mb: 2,
+                      fontWeight: 400
                     }}
                   >
                     {module.description}
@@ -429,9 +508,10 @@ export default function HomePage() {
                       alignItems: 'center',
                       gap: 1,
                       p: 1.5,
-                      bgcolor: alpha(module.color, 0.08),
+                      bgcolor: 'rgba(255,255,255,0.06)',
                       borderRadius: '8px',
-                      mt: 2
+                      mt: 2,
+                      justifyContent: 'center'
                     }}
                   >
                     <Typography
@@ -447,8 +527,9 @@ export default function HomePage() {
                       <Typography
                         variant="caption"
                         sx={{
-                          color: theme.palette.text.secondary,
-                          display: 'block'
+                          color: 'rgba(255,255,255,0.7)',
+                          display: 'block',
+                          fontWeight: 400
                         }}
                       >
                         {module.stats.label}
@@ -457,20 +538,29 @@ export default function HomePage() {
                   </Box>
                 </CardContent>
                 <CardActions sx={{ pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="text"
-                    endIcon={<MdArrowForward size={18} />}
-                    sx={{
-                      color: module.color,
-                      fontWeight: 600,
-                      '&:hover': {
-                        bgcolor: alpha(module.color, 0.08)
-                      }
-                    }}
-                  >
-                    Acceder
-                  </Button>
+                  <Tooltip title={`Acceder a ${module.title}`} arrow>
+                    <Button
+                      fullWidth
+                      variant="text"
+                      endIcon={<MdArrowForward size={18} />}
+                      sx={{
+                        color: module.color,
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        outline: 'none',
+                        fontSize: '1.05rem',
+                        '&:hover, &:focus': {
+                          bgcolor: 'rgba(255,255,255,0.08)',
+                          outline: `2px solid ${alpha(module.color, 0.3)}`
+                        }
+                      }}
+                      aria-label={`Acceder a ${module.title}`}
+                      onClick={e => { e.stopPropagation(); navigate(module.path) }}
+                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); navigate(module.path) } }}
+                    >
+                      Acceder
+                    </Button>
+                  </Tooltip>
                 </CardActions>
               </Card>
             </Grid>
@@ -481,21 +571,24 @@ export default function HomePage() {
       {/* Features Section */}
       <Box
         sx={{
-          bgcolor: alpha(theme.palette.primary.main, 0.04),
-          borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          background: 'rgba(24,28,36,0.92)',
+          borderTop: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
           py: 8,
           mb: 8
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ mb: 6 }}>
+          <Box sx={{ mb: 6, textAlign: 'center' }}>
             <Typography
               variant="h3"
               sx={{
-                fontWeight: 700,
-                color: theme.palette.primary.main,
-                mb: 1
+                fontWeight: 800,
+                color: '#fff',
+                mb: 1,
+                letterSpacing: '0.01em',
+                textTransform: 'uppercase',
+                fontSize: { xs: '1.4rem', sm: '2rem' }
               }}
             >
               Capacidades Principales
@@ -503,48 +596,74 @@ export default function HomePage() {
             <Typography
               variant="body1"
               sx={{
-                color: theme.palette.text.secondary,
-                opacity: 0.8
+                color: 'rgba(255,255,255,0.82)',
+                opacity: 0.92,
+                fontWeight: 400,
+                fontSize: { xs: '1rem', sm: '1.18rem' }
               }}
             >
               Herramientas avanzadas para gestión territorial eficiente
             </Typography>
           </Box>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
             {features.map((feature, index) => (
-              <Grid item xs={12} sm={6} md={6} key={index}>
+              <Grid item xs={12} sm={6} md={4} key={index}>
                 <Box
+                  role="region"
+                  aria-label={`Capacidad: ${feature.title}`}
+                  tabIndex={0}
                   sx={{
                     display: 'flex',
                     gap: 2,
                     p: 3,
-                    bgcolor: '#ffffff',
-                    borderRadius: '12px',
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.1)}`
+                    bgcolor: 'rgba(32,36,44,0.98)',
+                    borderRadius: '14px',
+                    border: 'none',
+                    color: '#fff',
+                    boxShadow: '0 2px 16px 0 rgba(0,0,0,0.18)',
+                    outline: 'none',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                    '&:hover, &:focus': {
+                      background: 'rgba(40,44,56,1)',
+                      boxShadow: '0 8px 32px 0 rgba(0,0,0,0.28)',
+                      transform: 'translateY(-2px) scale(1.02)'
                     }
                   }}
                 >
-                  <Box
-                    sx={{
-                      color: theme.palette.secondary.main,
-                      fontSize: '1.5rem',
-                      flexShrink: 0,
-                      mt: 0.5
-                    }}
-                  >
-                    <MdCheckCircle size={28} />
-                  </Box>
+                  <Tooltip title={feature.title + ': ' + feature.description} arrow>
+                    <Box
+                      sx={{
+                        color: theme.palette.secondary.main,
+                        fontSize: '2.1rem',
+                        flexShrink: 0,
+                        mt: 0.5,
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        bgcolor: 'rgba(255,255,255,0.06)',
+                        borderRadius: '50%',
+                        width: 44,
+                        height: 44,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 1.5
+                      }}
+                      aria-label={`Icono de ${feature.title}`}
+                      tabIndex={-1}
+                    >
+                      <MdCheckCircle size={28} />
+                    </Box>
+                  </Tooltip>
                   <Box>
                     <Typography
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: theme.palette.primary.main,
-                        mb: 0.5
+                        color: '#fff',
+                        mb: 0.5,
+                        fontSize: '1.08rem',
+                        letterSpacing: '0.01em'
                       }}
                     >
                       {feature.title}
@@ -552,8 +671,9 @@ export default function HomePage() {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: theme.palette.text.secondary,
-                        lineHeight: 1.6
+                        color: 'rgba(255,255,255,0.82)',
+                        lineHeight: 1.6,
+                        fontWeight: 400
                       }}
                     >
                       {feature.description}
@@ -568,13 +688,16 @@ export default function HomePage() {
 
       {/* Use Cases Section */}
       <Container maxWidth="lg" sx={{ mb: 8 }}>
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 700,
-              color: theme.palette.primary.main,
-              mb: 1
+              fontWeight: 800,
+              color: '#fff',
+              mb: 1,
+              letterSpacing: '0.01em',
+              textTransform: 'uppercase',
+              fontSize: { xs: '1.4rem', sm: '2rem' }
             }}
           >
             ÁBACO puede servir para
@@ -582,43 +705,58 @@ export default function HomePage() {
           <Typography
             variant="body1"
             sx={{
-              color: theme.palette.text.secondary,
-              opacity: 0.85
+              color: 'rgba(255,255,255,0.82)',
+              opacity: 0.92,
+              fontWeight: 400,
+              fontSize: { xs: '1rem', sm: '1.18rem' }
             }}
           >
             Casos de uso reales para gestión pública, operación territorial e inteligencia política.
           </Typography>
         </Box>
 
-        <Grid container spacing={2.5}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           {useCases.map((block) => (
             <Grid item xs={12} md={6} key={block.title}>
               <Card
+                role="region"
+                aria-label={`Casos de uso: ${block.title}`}
+                tabIndex={0}
                 sx={{
                   height: '100%',
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`,
-                  borderRadius: 2.5,
-                  transition: 'all 0.25s ease',
-                  '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.26),
-                    boxShadow: `0 12px 30px ${alpha(theme.palette.primary.main, 0.1)}`
+                  background: 'rgba(24,28,36,0.92)',
+                  color: '#fff',
+                  borderRadius: 3,
+                  border: 'none',
+                  boxShadow: '0 2px 16px 0 rgba(0,0,0,0.18)',
+                  outline: 'none',
+                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover, &:focus': {
+                    background: 'rgba(40,44,56,0.98)',
+                    boxShadow: '0 8px 32px 0 rgba(0,0,0,0.28)',
+                    transform: 'translateY(-2px) scale(1.02)'
                   }
                 }}
               >
                 <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme.palette.primary.main,
-                      mb: 1.5
-                    }}
-                  >
-                    {block.title}
-                  </Typography>
+                  <Tooltip title={block.title + ': Casos de uso'} arrow>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#fff',
+                        mb: 1.5,
+                        fontSize: '1.08rem',
+                        letterSpacing: '0.01em'
+                      }}
+                      aria-label={`Título de casos de uso: ${block.title}`}
+                    >
+                      {block.title}
+                    </Typography>
+                  </Tooltip>
                   <Stack spacing={0.9}>
                     {block.items.map((item) => (
-                      <Typography key={item} variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
+                      <Typography key={item} variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', lineHeight: 1.6, fontWeight: 400 }}>
                         {item}
                       </Typography>
                     ))}
@@ -633,21 +771,24 @@ export default function HomePage() {
       {/* Future Modules Section */}
       <Box
         sx={{
-          bgcolor: alpha(theme.palette.secondary.main, 0.05),
-          borderTop: `1px solid ${alpha(theme.palette.secondary.main, 0.14)}`,
-          borderBottom: `1px solid ${alpha(theme.palette.secondary.main, 0.14)}`,
+          background: 'rgba(24,28,36,0.92)',
+          borderTop: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
           py: 7,
           mb: 8
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 4, textAlign: 'center' }}>
             <Typography
               variant="h3"
               sx={{
-                fontWeight: 700,
-                color: theme.palette.primary.main,
-                mb: 1
+                fontWeight: 800,
+                color: '#fff',
+                mb: 1,
+                letterSpacing: '0.01em',
+                textTransform: 'uppercase',
+                fontSize: { xs: '1.4rem', sm: '2rem' }
               }}
             >
               Nuevos módulos opcionales (fase futura)
@@ -655,26 +796,33 @@ export default function HomePage() {
             <Typography
               variant="body1"
               sx={{
-                color: theme.palette.text.secondary,
-                opacity: 0.85
+                color: 'rgba(255,255,255,0.82)',
+                opacity: 0.92,
+                fontWeight: 400,
+                fontSize: { xs: '1rem', sm: '1.18rem' }
               }}
             >
               Roadmap funcional para ampliar capacidades operativas, sociales y estratégicas.
             </Typography>
           </Box>
 
-          <Grid container spacing={2.5}>
+          <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
             {futureModules.map((module) => (
               <Grid item xs={12} md={6} key={module.title}>
                 <Card
                   sx={{
                     height: '100%',
-                    border: `1px solid ${alpha(theme.palette.secondary.main, 0.22)}`,
-                    borderRadius: 2.5,
-                    transition: 'all 0.25s ease',
-                    '&:hover': {
-                      borderColor: alpha(theme.palette.secondary.main, 0.38),
-                      boxShadow: `0 12px 30px ${alpha(theme.palette.secondary.main, 0.14)}`
+                    background: 'rgba(32,36,44,0.98)',
+                    color: '#fff',
+                    borderRadius: 3,
+                    border: 'none',
+                    boxShadow: '0 2px 16px 0 rgba(0,0,0,0.18)',
+                    outline: 'none',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                    '&:hover, &:focus': {
+                      background: 'rgba(40,44,56,1)',
+                      boxShadow: '0 8px 32px 0 rgba(0,0,0,0.28)',
+                      transform: 'translateY(-2px) scale(1.02)'
                     }
                   }}
                 >
@@ -683,8 +831,10 @@ export default function HomePage() {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: theme.palette.primary.main,
-                        mb: 1.25
+                        color: '#fff',
+                        mb: 1.25,
+                        fontSize: '1.08rem',
+                        letterSpacing: '0.01em'
                       }}
                     >
                       {module.title}
@@ -694,7 +844,7 @@ export default function HomePage() {
                         <Typography
                           key={item}
                           variant="body2"
-                          sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}
+                          sx={{ color: 'rgba(255,255,255,0.82)', lineHeight: 1.6, fontWeight: 400 }}
                         >
                           • {item}
                         </Typography>
@@ -713,18 +863,25 @@ export default function HomePage() {
         <Box
           sx={{
             textAlign: 'center',
-            p: 6,
-            borderRadius: '16px',
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.08)} 100%)`,
-            border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
+            p: { xs: 4, sm: 6 },
+            borderRadius: '18px',
+            background: 'rgba(24,28,36,0.92)',
+            border: 'none',
+            boxShadow: '0 2px 24px 0 rgba(0,0,0,0.18)',
+            color: '#fff',
+            maxWidth: 700,
+            mx: 'auto',
           }}
         >
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 700,
-              color: theme.palette.primary.main,
-              mb: 2
+              fontWeight: 900,
+              color: '#fff',
+              mb: 2,
+              letterSpacing: '0.01em',
+              textTransform: 'uppercase',
+              fontSize: { xs: '1.5rem', sm: '2.2rem' }
             }}
           >
             Lista para Producción
@@ -732,11 +889,12 @@ export default function HomePage() {
           <Typography
             variant="body1"
             sx={{
-              color: theme.palette.text.secondary,
+              color: 'rgba(255,255,255,0.82)',
               mb: 4,
               maxWidth: '500px',
               mx: 'auto',
-              lineHeight: 1.8
+              lineHeight: 1.8,
+              fontWeight: 400
             }}
           >
             Sistema completamente operativo con todas las funcionalidades necesarias para gestión territorial integral. Desplegable en producción con total confiabilidad.
@@ -747,15 +905,15 @@ export default function HomePage() {
             sx={{
               height: 8,
               borderRadius: 4,
-              bgcolor: alpha(theme.palette.primary.main, 0.2),
+              bgcolor: 'rgba(255,255,255,0.08)',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 4,
-                background: `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`
+                background: 'linear-gradient(90deg, #fff 0%, #3b82f6 100%)'
               },
               mb: 3
             }}
           />
-          <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
             100% Sistema Operativo
           </Typography>
         </Box>

@@ -120,6 +120,10 @@ function withId(payload) {
 }
 
 export default function AbacoTrainingPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const [role, setRole] = useState('personero')
   const [tab, setTab] = useState(0)

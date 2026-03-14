@@ -9,6 +9,8 @@
  * @property {string} name - Nombre completo
  * @property {string} email - Email único
  * @property {string} password_hash - Hash de contraseña (bcryptjs)
+ * @property {string} pin_hash - Hash seguro del PIN de acceso
+ * @property {string} pattern_hash - Hash seguro del patrón/secuencia de acciones
  * @property {'admin'|'operator'|'auditor'|'viewer'} role - Rol del usuario
  * @property {string} phone - Teléfono de contacto
  * @property {number} zone_id - ID de la zona asignada
@@ -21,6 +23,8 @@ export const UserModel = {
   name: 'string',
   email: 'string',
   password_hash: 'string',
+  pin_hash: 'string',
+  pattern_hash: 'string',
   role: 'enum[admin,operator,auditor,viewer]',
   phone: 'string',
   zone_id: 'number',

@@ -39,6 +39,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 export default function FilesPage() {
+    useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const [files, setFiles] = useState([])
   const [openDialog, setOpenDialog] = useState(false)
   const [newFile, setNewFile] = useState({

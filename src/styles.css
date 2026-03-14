@@ -1,9 +1,79 @@
+/* Animación para LinearProgress */
+.MuiLinearProgress-bar {
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Animación para CircularProgress */
+.MuiCircularProgress-svg {
+  animation: spinLoader 1.1s linear infinite;
+}
+
+/* Drawer animación de apertura/cierre */
+.MuiDrawer-paper {
+  transition: width 0.32s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+}
+
+/* Tabs indicador animado */
+.MuiTabs-indicator {
+  transition: left 0.32s cubic-bezier(0.4,0,0.2,1), width 0.32s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+}
+
+/* Feedback visual en TextField (focus y error) */
+.MuiInputBase-root.Mui-focused {
+  box-shadow: 0 0 0 2px #6366f133;
+  transition: box-shadow 0.22s;
+}
+.MuiFormControl-root .Mui-error .MuiInputBase-root {
+  box-shadow: 0 0 0 2px #ef444433;
+  transition: box-shadow 0.22s;
+}
 :root{
   --bg:#f7f8fb;
   --card:#ffffff;
   --accent:#1f6feb;
 }
-body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0; background:var(--bg); color:#111}
+body{
+  font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
+  margin:0;
+  background:var(--bg);
+  color:#111;
+  transition: background 0.4s, color 0.4s;
+}
+
+/* Animación de transición de página */
+.fade-page {
+  animation: fadeInPage 0.55s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes fadeInPage {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Microinteracciones en botones */
+button, .MuiButton-root {
+  transition: box-shadow 0.22s, transform 0.18s;
+}
+button:active, .MuiButton-root:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+/* Microinteracciones en cards */
+.card, .MuiCard-root {
+  transition: box-shadow 0.22s, transform 0.18s;
+}
+.card:active, .MuiCard-root:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+/* Animación de loader */
+.spin-loader {
+  animation: spinLoader 1.1s linear infinite;
+}
+@keyframes spinLoader {
+  100% { transform: rotate(360deg); }
+}
 .app-header{padding:24px; background:linear-gradient(90deg,var(--accent),#3aa0ff); color:#fff}
 .app-header h1{margin:0}
 .dashboard{padding:20px}

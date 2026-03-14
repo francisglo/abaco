@@ -23,9 +23,9 @@ export default function ManagementIndicatorsPage() {
         }}
       >
         <CardContent>
-          <Typography variant="h5" fontWeight={800}>Módulo de Indicadores de Gestión</Typography>
-          <Typography variant="body2" sx={{ opacity: 0.92, mt: 0.5 }}>
-            MVP inicial para medir desempeño, resultados y señales de riesgo en operación territorial.
+          <Typography variant="h5" fontWeight={800}>Inversión Pública · Priorización Territorial</Typography>
+          <Typography variant="body2" sx={{ opacity: 0.92, mt: 0.5, fontWeight: 500 }}>
+            Priorización territorial de proyectos públicos: identifica zonas estratégicas para inversión, seguimiento de metas y señales de riesgo en la gestión pública.
           </Typography>
         </CardContent>
       </Card>

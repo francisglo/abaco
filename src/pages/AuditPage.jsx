@@ -25,6 +25,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 export default function AuditPage() {
+    useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const [auditLogs, setAuditLogs] = useState([])
   const [filteredLogs, setFilteredLogs] = useState([])
   const [searchQuery, setSearchQuery] = useState('')

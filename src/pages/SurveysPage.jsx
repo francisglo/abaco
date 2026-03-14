@@ -66,6 +66,10 @@ const defaultSeedSurveys = [
 ]
 
 export default function SurveysPage() {
+    useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const [surveys, setSurveys] = useState([])
   const [responses, setResponses] = useState([])
   const [totalContacts, setTotalContacts] = useState(0)

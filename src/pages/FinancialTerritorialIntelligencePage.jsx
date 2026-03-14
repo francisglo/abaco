@@ -401,8 +401,8 @@ export default function FinancialTerritorialIntelligencePage() {
                 <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main, mb: 1 }}>
                   Inteligencia Financiera Territorial
                 </Typography>
-                <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 880 }}>
-                  Vertical especializado para entidades financieras: analiza potencial económico, riesgo territorial, cobertura y programas de crédito sin mezclar la operación electoral.
+                <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 880, fontWeight: 500 }}>
+                  Análisis de acceso al crédito, inclusión financiera y oportunidades económicas: identifica territorios con baja bancarización, evalúa riesgo y potencial de clusters económicos.
                 </Typography>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1.2 }}>
                   <Chip label={`Territorio: ${territory}`} size="small" variant="outlined" />

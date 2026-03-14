@@ -12,22 +12,29 @@
 
 **Documentación completa**: Ver [MODULES.md](./MODULES.md) para detalles técnicos de cada módulo.
 
-## 🚀 Instalación
+## 🚀 Instalación y Deploy
 
-### Requisitos
+
+### Requisitos locales
 - Node.js >= 18
 - PostgreSQL 12+
 - npm >= 9
 
+### Deploy en Vercel
+El backend se expone como API serverless en `/api` (raíz del repo, enlaza a `/backend/src/app.js`).
+Configura las variables de entorno en el dashboard de Vercel (ver README principal).
+
 ### Pasos
 
-1. **Instalar dependencias**
+
+1. **Instalar dependencias locales**
 ```bash
 cd backend
 npm install
 ```
 
-2. **Configurar variables de entorno**
+
+2. **Configurar variables de entorno locales**
 ```bash
 cp .env.example .env
 # Editar .env con tu configuración
@@ -38,7 +45,8 @@ cp .env.example .env
 node scripts/init-db.js
 ```
 
-4. **Iniciar servidor**
+
+4. **Iniciar servidor local**
 ```bash
 npm run dev     # Desarrollo con hot reload
 npm start       # Producción

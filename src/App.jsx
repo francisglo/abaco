@@ -7,6 +7,8 @@ import { useAuth } from './context/AuthContext'
 
 import theme from './theme'
 import Layout from './components/Layout'
+import ABAssistant from './components/ABAssistant'
+import OnboardingTour from './components/OnboardingTour'
 import ErrorBoundary from './components/ErrorBoundary'
 import NetworkStatusBar from './components/NetworkStatusBar'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -48,6 +50,16 @@ const AbacoVerticalDetailPage = lazy(() => import('./pages/AbacoVerticalDetailPa
 const AbacoIntegratedBiPage = lazy(() => import('./pages/AbacoIntegratedBiPage'))
 const OperationalAlgorithmsPage = lazy(() => import('./pages/OperationalAlgorithmsPage'))
 
+// Dashboards funcionales de módulos principales
+const ElectoralDashboard = lazy(() => import('./pages/ElectoralDashboard'))
+const TerritorialDashboard = lazy(() => import('./pages/TerritorialDashboard'))
+const FinancieraDashboard = lazy(() => import('./pages/FinancieraDashboard'))
+const DesarrolloEconomicoDashboard = lazy(() => import('./pages/DesarrolloEconomicoDashboard'))
+const InversionPublicaDashboard = lazy(() => import('./pages/InversionPublicaDashboard'))
+const InclusionFinancieraDashboard = lazy(() => import('./pages/InclusionFinancieraDashboard'))
+const CooperacionDesarrolloDashboard = lazy(() => import('./pages/CooperacionDesarrolloDashboard'))
+const OrdenamientoTerritorialDashboard = lazy(() => import('./pages/OrdenamientoTerritorialDashboard'))
+
 // Componente de carga
 function LoadingFallback() {
   return (
@@ -88,6 +100,8 @@ export default function App() {
         <BrowserRouter>
           <NetworkStatusBar />
           <Layout>
+            <OnboardingTour />
+            <ABAssistant />
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -123,6 +137,14 @@ export default function App() {
                 <Route path="/management-indicators" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'auditor', 'viewer']}><ManagementIndicatorsPage /></ProtectedRoute>} />
                 <Route path="/strategic-intelligence" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'auditor']}><StrategicIntelligencePage /></ProtectedRoute>} />
                 <Route path="/financial-intelligence" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><FinancialTerritorialIntelligencePage /></ProtectedRoute>} />
+                <Route path="/abaco-electoral/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><ElectoralDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-gubernamental/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><TerritorialDashboard /></ProtectedRoute>} />
+                <Route path="/financial-intelligence/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><FinancieraDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/desarrollo-economico-territorial/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><DesarrolloEconomicoDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/inversion-publica/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><InversionPublicaDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/inclusion-financiera/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><InclusionFinancieraDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/cooperacion-desarrollo/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><CooperacionDesarrolloDashboard /></ProtectedRoute>} />
+                <Route path="/abaco-verticales/ordenamiento-territorial-planeacion-urbana/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager', 'operator', 'auditor', 'viewer']}><OrdenamientoTerritorialDashboard /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to={roleHome} replace />} />
               </Routes>
             </Suspense>

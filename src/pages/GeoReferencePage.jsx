@@ -27,6 +27,7 @@ import {
 import { fetchGeoFeatures, fetchGeoNearby, fetchGeoSyncStatus, fetchZonesSecure, fetchGeo3DModel, fetchGeo3DTileset } from '../api'
 import { useAuth } from '../context/AuthContext'
 import Geo3DViewer from '../components/Geo3DViewer'
+const Map3DDeckGL = React.lazy(() => import('../components/Map3DDeckGL'));
 import {
   MdMap,
   MdLayers,
@@ -92,7 +93,15 @@ export default function GeoReferencePage() {
   const [geo3DModel, setGeo3DModel] = useState(null)
   const [geo3DTileset, setGeo3DTileset] = useState(null)
   const [show3DViewer, setShow3DViewer] = useState(false)
+  const [show3DMap, setShow3DMap] = useState(false)
   const [loading3D, setLoading3D] = useState(false)
+  const [metric3D, setMetric3D] = useState('cobertura');
+  // Métricas disponibles para el mapa 3D
+  const metricOptions = [
+    { value: 'cobertura', label: 'Cobertura (%)' },
+    { value: 'poblacion', label: 'Población' },
+    { value: 'prioridad', label: 'Prioridad' }
+  ];
 
   // Filtros
   const [selectedZone, setSelectedZone] = useState('')
@@ -1179,33 +1188,38 @@ export default function GeoReferencePage() {
 
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.08)' }}>
               <CardHeader
-                title="Visualización 3D Territorial"
+                title="Mapa 3D Interactivo (deck.gl)"
                 titleTypographyProps={{ variant: 'subtitle1', fontWeight: 600 }}
-                subheader={geo3DTileset?.asset?.version ? `3D Tileset v${geo3DTileset.asset.version}` : 'Carga el modelo generado desde PostGIS'}
+                subheader={data.geojson?.features?.length ? `Zonas: ${data.geojson.features.length}` : 'Carga los datos territoriales para visualizar en 3D'}
                 sx={{ bgcolor: '#f3f4f6', borderBottom: '1px solid rgba(0,0,0,0.08)', py: 1.5 }}
                 action={
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="outlined" size="small" onClick={handleLoad3D} disabled={loading3D}>
-                      {loading3D ? 'Cargando...' : 'Cargar 3D'}
-                    </Button>
-                    {show3DViewer && (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setShow3DViewer(false)}
+                    <FormControl size="small" sx={{ minWidth: 140 }}>
+                      <InputLabel>Métrica 3D</InputLabel>
+                      <Select
+                        value={metric3D}
+                        label="Métrica 3D"
+                        onChange={e => setMetric3D(e.target.value)}
                       >
-                        Ocultar
-                      </Button>
-                    )}
+                        {metricOptions.map(opt => (
+                          <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Button variant="outlined" size="small" onClick={() => setShow3DMap((v) => !v)}>
+                      {show3DMap ? 'Ocultar 3D' : 'Ver mapa 3D'}
+                    </Button>
                   </Box>
                 }
               />
               <CardContent>
-                {show3DViewer && geo3DModel ? (
-                  <Geo3DViewer gltfData={geo3DModel} height={420} />
+                {show3DMap ? (
+                  <React.Suspense fallback={<Typography>Cargando mapa 3D...</Typography>}>
+                    <Map3DDeckGL geojson={data.geojson} height={420} metric={metric3D} />
+                  </React.Suspense>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    Presiona "Cargar 3D" para visualizar el modelo glTF territorial interactivo.
+                    Presiona "Ver mapa 3D" para visualizar las zonas territoriales en 3D interactivo.
                   </Typography>
                 )}
               </CardContent>

@@ -15,6 +15,10 @@ const electoralModules = [
 ]
 
 export default function AbacoElectoralSectionPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -39,15 +43,15 @@ export default function AbacoElectoralSectionPage() {
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
               <MdHowToVote size={30} color={theme.palette.primary.main} />
               <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
-                ÁBACO Electoral
+                Inteligencia Electoral
               </Typography>
             </Stack>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 820 }}>
-              División electoral de la plataforma con toda la operación territorial, gestión de contactos, encuestas y seguimiento de campo.
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 820, fontWeight: 500 }}>
+              Análisis territorial avanzado para campañas políticas: operación electoral, gestión de campo, encuestas y segmentación de votantes.
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }}>
-              <Chip label="Operación electoral" color="primary" variant="outlined" />
-              <Chip label="Trabajo territorial" color="secondary" variant="outlined" />
+              <Chip label="Campañas políticas" color="primary" variant="outlined" />
+              <Chip label="Análisis territorial" color="secondary" variant="outlined" />
             </Stack>
           </CardContent>
         </Card>

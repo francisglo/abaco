@@ -79,3 +79,30 @@ Login de desarrollo para usuarios existentes de `mock/db.json` (si aún no tiene
 ## Documentación de negocio
 
 - Modelo comercial y monetización: [MODELO_NEGOCIO_ABACO.md](MODELO_NEGOCIO_ABACO.md)
+
+## 🚀 Deploy en Vercel (Fullstack)
+
+Este proyecto está listo para deployar en Vercel como monorepo:
+- **Frontend:** Vite + React (raíz)
+- **Backend API:** Express (en `/api`, enlaza a `/backend/src/app.js`)
+
+### Variables de entorno recomendadas
+
+**Frontend (.env, configurar en Vercel):**
+- `VITE_API_URL=https://<tu-proyecto>.vercel.app/api`
+- `VITE_GOOGLE_CLIENT_ID=<tu-client-id-google>`
+- `VITE_AUTH_ALLOW_LOCAL_FALLBACK=false`
+
+**Backend (configurar en Vercel, scope: API):**
+- `NODE_ENV=production`
+- `DB_HOST=<host-db>`
+- `DB_PORT=<puerto-db>`
+- `DB_NAME=<nombre-db>`
+- `DB_USER=<usuario-db>`
+- `DB_PASSWORD=<password-db>`
+- `JWT_SECRET=<clave-jwt-segura>`
+- `JWT_EXPIRES_IN=7d`
+- `LEDGER_ENCRYPTION_KEY=<clave-ledger>`
+- `GOOGLE_CLIENT_ID=<tu-client-id-google>`
+
+Configura estas variables en el dashboard de Vercel (Project Settings > Environment Variables) para ambos entornos (Production y Preview).

@@ -1,39 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react'
-import {
-  Alert,
-  alpha,
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Divider,
-  Fade,
-  Grow,
-  InputAdornment,
-  Paper,
-  Slide,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography
-} from '@mui/material'
-import { MdLockOutline, MdOutlineMail, MdPersonAddAlt1 } from 'react-icons/md'
-import { useAuth } from '../context/AuthContext'
-import abacoLogo from '../../TFG/TFG.png'
-import abacoLogoAnimated from '../../TFG/TFG.GIF?url'
+import React, { useEffect, useRef, useState, useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
+import { getGoogleClientId } from '../utils/env'
+import abacoLogo from '../../TFG/TFG.png';
+import { Alert, alpha, Avatar, Box, Button, Card, CardContent, CircularProgress, Divider, Fade, Grow, InputAdornment, Paper, Stack, Typography, Tabs, Tab, Slide, TextField } from '@mui/material';
+import { MdLockOutline, MdOutlineMail, MdPersonAddAlt1 } from 'react-icons/md';
+
+// Utilidades fuera del componente
+const isTrivialSequence = (str) => {
+  const trivial = ['1234', '1111', '0000', 'abcd', 'qwer', 'asdf', '4321', '2222', '9999']
+  return trivial.includes((str || '').toLowerCase())
+}
+
+const isStrongPassword = (str) => {
+  // Al menos 6 caracteres, mayúscula, minúscula, número y símbolo
+  return /[A-Z]/.test(str) && /[a-z]/.test(str) && /[0-9]/.test(str) && /[^A-Za-z0-9]/.test(str) && (str || '').length >= 6
+}
 
 export default function AuthPage() {
-  const { login, register, loginWithGoogle, loading } = useAuth()
-  const [tab, setTab] = useState(0)
-  const [error, setError] = useState('')
+  const { loginWithGoogle } = useContext(AuthContext)
   const [animatedLogoError, setAnimatedLogoError] = useState(false)
   const [logoError, setLogoError] = useState(false)
-
-  const googleButtonRef = useRef(null)
-  const [loginForm, setLoginForm] = useState({ identifier: '', password: '' })
+  const [tab, setTab] = useState(0);
+  const [error, setError] = useState('');
+  const [loginForm, setLoginForm] = useState({
+    identifier: '',
+    method: 'password',
+    password: '',
+    pin: '',
+    pattern: ''
+  });
+  const [loading, setLoading] = useState(false);
   const [registerForm, setRegisterForm] = useState({
     name: '',
     username: '',
@@ -41,11 +37,17 @@ export default function AuthPage() {
     password: '',
     confirmPassword: '',
     phone: '',
-    bio: ''
-  })
-
+    bio: '',
+    pin: '',
+    pattern: ''
+  });
+  const googleButtonRef = useRef(null);
+  // ...existing code...
   const onChangeLogin = (field) => (event) => {
     setLoginForm((prev) => ({ ...prev, [field]: event.target.value }))
+  }
+  const onChangeLoginMethod = (event, value) => {
+    setLoginForm((prev) => ({ ...prev, method: value, password: '', pin: '', pattern: '' }))
   }
 
   const onChangeRegister = (field) => (event) => {
@@ -56,7 +58,11 @@ export default function AuthPage() {
     event.preventDefault()
     setError('')
     try {
-      await login({ identifier: loginForm.identifier.trim(), password: loginForm.password })
+      const payload = { identifier: loginForm.identifier.trim() }
+      if (loginForm.method === 'password') payload.password = loginForm.password
+      if (loginForm.method === 'pin') payload.pin = loginForm.pin
+      if (loginForm.method === 'pattern') payload.pattern = loginForm.pattern
+      await login(payload)
     } catch (submitError) {
       setError(submitError.message || 'No se pudo iniciar sesión')
     }
@@ -76,6 +82,37 @@ export default function AuthPage() {
       return
     }
 
+    // Validación de PIN: numérico, mínimo 4, no secuencial ni repetido
+    if (registerForm.pin) {
+      if (!/^[0-9]{4,12}$/.test(registerForm.pin)) {
+        setError('El PIN debe ser numérico y tener entre 4 y 12 dígitos')
+        return
+      }
+      const sequential = /^(0123|1234|2345|3456|4567|5678|6789|9876|8765|7654|6543|5432|4321)$/;
+      const repeated = /^([0-9])\1+$/;
+      if (sequential.test(registerForm.pin) || repeated.test(registerForm.pin)) {
+        setError('El PIN no puede ser una secuencia simple ni dígitos repetidos')
+        return
+      }
+    }
+    // Validación de patrón: mínimo 4, no trivial
+    if (registerForm.pattern) {
+      if (registerForm.pattern.length < 4) {
+        setError('El patrón debe tener al menos 4 caracteres')
+        return
+      }
+      const trivialPatterns = ['abcd', 'dcba', 'qwer', 'asdf', 'zxcv', '1234', '4321', '1111', '0000'];
+      if (trivialPatterns.includes(registerForm.pattern.toLowerCase())) {
+        setError('El patrón es demasiado simple, elige otro')
+        return
+      }
+    }
+    // Validación de contraseña fuerte
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/.test(registerForm.password)) {
+      setError('La contraseña debe tener mayúsculas, minúsculas, número y símbolo')
+      return
+    }
+
     try {
       await register({
         name: registerForm.name.trim(),
@@ -83,15 +120,18 @@ export default function AuthPage() {
         email: registerForm.email.trim(),
         password: registerForm.password,
         phone: registerForm.phone.trim(),
-        bio: registerForm.bio.trim()
+        bio: registerForm.bio.trim(),
+        pin: registerForm.pin,
+        pattern: registerForm.pattern
       })
     } catch (submitError) {
       setError(submitError.message || 'No se pudo crear la cuenta')
     }
   }
 
+
   useEffect(() => {
-    const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim()
+    const clientId = getGoogleClientId()
     if (!clientId || !googleButtonRef.current) return
 
     const ensureScript = () => new Promise((resolve, reject) => {
@@ -248,7 +288,7 @@ export default function AuthPage() {
                 {!animatedLogoError ? (
                   <Box
                     component="img"
-                    src={abacoLogoAnimated}
+                    src={"/TFG/TFG.GIF"}
                     alt="ÁBACO dinámico"
                     onError={() => setAnimatedLogoError(true)}
                     sx={{
@@ -365,21 +405,73 @@ export default function AuthPage() {
                               )
                             }}
                           />
-                          <TextField
-                            label="Contraseña"
-                            type="password"
-                            value={loginForm.password}
-                            onChange={onChangeLogin('password')}
-                            required
-                            fullWidth
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <MdLockOutline />
-                                </InputAdornment>
-                              )
-                            }}
-                          />
+                          <Tabs
+                            value={loginForm.method}
+                            onChange={onChangeLoginMethod}
+                            indicatorColor="primary"
+                            textColor="primary"
+                            variant="fullWidth"
+                            sx={{ mb: 1 }}
+                          >
+                            <Tab value="password" label="Contraseña" />
+                            <Tab value="pin" label="PIN" />
+                            <Tab value="pattern" label="Patrón" />
+                          </Tabs>
+                          {loginForm.method === 'password' && (
+                            <TextField
+                              label="Contraseña"
+                              type="password"
+                              value={loginForm.password}
+                              onChange={onChangeLogin('password')}
+                              required
+                              fullWidth
+                              helperText="Introduce tu contraseña."
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <MdLockOutline />
+                                  </InputAdornment>
+                                )
+                              }}
+                            />
+                          )}
+                          {loginForm.method === 'pin' && (
+                            <TextField
+                              label="PIN"
+                              type="password"
+                              value={loginForm.pin}
+                              onChange={onChangeLogin('pin')}
+                              required
+                              fullWidth
+                              inputProps={{ maxLength: 12, inputMode: 'numeric', pattern: '[0-9]*' }}
+                              helperText="PIN numérico definido al registrarte."
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <MdLockOutline />
+                                  </InputAdornment>
+                                )
+                              }}
+                            />
+                          )}
+                          {loginForm.method === 'pattern' && (
+                            <TextField
+                              label="Patrón o secuencia"
+                              type="password"
+                              value={loginForm.pattern}
+                              onChange={onChangeLogin('pattern')}
+                              required
+                              fullWidth
+                              helperText="Patrón o secuencia definida al registrarte."
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <MdLockOutline />
+                                  </InputAdornment>
+                                )
+                              }}
+                            />
+                          )}
                           <Button
                             type="submit"
                             variant="contained"
@@ -464,6 +556,7 @@ export default function AuthPage() {
                             onChange={onChangeRegister('password')}
                             required
                             fullWidth
+                            helperText="Mínimo 6 caracteres, usa mayúsculas, minúsculas, número y símbolo."
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
@@ -479,6 +572,7 @@ export default function AuthPage() {
                             onChange={onChangeRegister('confirmPassword')}
                             required
                             fullWidth
+                            helperText="Repite la contraseña para confirmar."
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
@@ -486,6 +580,23 @@ export default function AuthPage() {
                                 </InputAdornment>
                               )
                             }}
+                          />
+                          <TextField
+                            label="PIN (opcional)"
+                            type="password"
+                            value={registerForm.pin}
+                            onChange={onChangeRegister('pin')}
+                            fullWidth
+                            inputProps={{ maxLength: 12, inputMode: 'numeric', pattern: '[0-9]*' }}
+                            helperText="PIN numérico para acceso rápido (mínimo 4 dígitos, evita secuencias simples como 1234)"
+                          />
+                          <TextField
+                            label="Patrón o secuencia (opcional)"
+                            type="password"
+                            value={registerForm.pattern}
+                            onChange={onChangeRegister('pattern')}
+                            fullWidth
+                            helperText="Secuencia de caracteres como backup (mínimo 4 caracteres, evita patrones triviales como abcd o 1111)"
                           />
                           <Button
                             type="submit"

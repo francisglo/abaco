@@ -27,6 +27,10 @@ import {
 } from 'react-icons/md'
 
 export default function LeaderboardPage() {
+    useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const [leaderboard, setLeaderboard] = useState([])
   const [currentUser, setCurrentUser] = useState(null)
   const [achievements, setAchievements] = useState([])

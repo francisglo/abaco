@@ -36,6 +36,10 @@ import { format, addDays, startOfWeek, isSameDay, subDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 export default function TasksPage() {
+    useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const dispatch = useDispatch()
   const { tasks, loading } = useSelector(s => s.tasks)
   const { users } = useSelector(s => s.users)

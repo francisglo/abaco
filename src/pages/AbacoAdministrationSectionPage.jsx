@@ -17,6 +17,10 @@ const administrationModules = [
 ]
 
 export default function AbacoAdministrationSectionPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const navigate = useNavigate()
   const { user } = useAuth()

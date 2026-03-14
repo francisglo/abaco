@@ -62,6 +62,10 @@ const verticalGroups = [
 ]
 
 export default function AbacoVerticalsSectionPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const navigate = useNavigate()
 
@@ -78,10 +82,10 @@ export default function AbacoVerticalsSectionPage() {
         >
           <CardContent>
             <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main, mb: 1 }}>
-              ÁBACO · Ecosistema de Verticales
+              Verticales Sectoriales Estratégicos
             </Typography>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 860, mb: 2 }}>
-              Organización estratégica de verticales para gobierno, economía, planeación, cooperación, sostenibilidad y gobernanza territorial.
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 860, mb: 2, fontWeight: 500 }}>
+              Acceso directo a módulos de desarrollo económico territorial (identificación de clústeres y oportunidades predictivas), inversión pública (priorización territorial de proyectos), inclusión financiera (zonas con baja bancarización) y cooperación y desarrollo (monitoreo territorial de programas).
             </Typography>
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
               <Chip label="Análisis territorial" color="primary" variant="outlined" />

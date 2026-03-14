@@ -1,4 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
+import { useThemeMode } from '../context/ThemeModeContext'
+import { MdDarkMode, MdLightMode } from 'react-icons/md'
 import { AppBar, Toolbar, Typography, Drawer, List, ListItemButton, ListItemText, Box, IconButton, Divider, ListItemIcon, useTheme, alpha, Tooltip, Avatar, Menu, MenuItem, useMediaQuery, Chip, Button, Select } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -42,6 +44,7 @@ import { canAccessByRole, normalizeRole, getRoleLabel, getViewModeByPath, VIEW_M
 const drawerWidth = 260
 
 export default function Layout({ children }) {
+  const { mode, setMode } = useThemeMode();
   const [open, setOpen] = useState(true)
   const [anchorEl, setAnchorEl] = useState(null)
   const location = useLocation()
@@ -92,16 +95,50 @@ export default function Layout({ children }) {
       ]
     },
     {
-      title: 'Electoral',
+      title: 'Inteligencia Electoral',
       items: [
-        { text: 'Panel Electoral', icon: <MdHowToVote size={20} />, path: '/abaco-electoral', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
+        { text: 'Análisis Territorial Electoral', icon: <MdHowToVote size={20} />, path: '/abaco-electoral', allowedRoles: ['admin', 'manager', 'operator'] },
+        { text: 'Dashboard Electoral', icon: <MdHowToVote size={20} />, path: '/abaco-electoral/dashboard', allowedRoles: ['admin', 'manager', 'operator'] },
       ]
     },
     {
-      title: 'Gubernamental',
+      title: 'Inteligencia Territorial Pública',
       items: [
-        { text: 'Panel Gubernamental', icon: <MdCorporateFare size={20} />, path: '/abaco-gubernamental', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer', 'visitor'] },
-        { text: 'Panel de Decisión', icon: <MdAccountBalance size={20} />, path: '/financial-intelligence', allowedRoles: ['admin', 'manager', 'operator', 'auditor', 'viewer'] },
+        { text: 'Gestión y Planificación Gubernamental', icon: <MdCorporateFare size={20} />, path: '/abaco-gubernamental', allowedRoles: ['admin', 'manager', 'operator'] },
+        { text: 'Dashboard Territorial Público', icon: <MdCorporateFare size={20} />, path: '/abaco-gubernamental/dashboard', allowedRoles: ['admin', 'manager', 'operator'] },
+      ]
+    },
+    {
+      title: 'Inteligencia Financiera Territorial',
+      items: [
+        { text: 'Acceso al Crédito e Inclusión', icon: <MdAccountBalance size={20} />, path: '/financial-intelligence', allowedRoles: ['admin', 'manager', 'operator'] },
+        { text: 'Dashboard Financiero Territorial', icon: <MdAccountBalance size={20} />, path: '/financial-intelligence/dashboard', allowedRoles: ['admin', 'manager', 'operator'] },
+      ]
+    },
+    {
+      title: 'Desarrollo Económico Territorial',
+      items: [
+        { text: 'Clústeres Económicos y Oportunidades', icon: <MdTrendingUp size={20} />, path: '/financial-intelligence', allowedRoles: ['admin', 'manager', 'operator'] },
+      ]
+    },
+    {
+      title: 'Inversión Pública',
+      items: [
+        { text: 'Priorización Territorial de Proyectos', icon: <MdInsights size={20} />, path: '/management-indicators', allowedRoles: ['admin', 'manager', 'operator'] },
+        { text: 'Dashboard Inversión Pública', icon: <MdInsights size={20} />, path: '/abaco-verticales/inversion-publica/dashboard', allowedRoles: ['admin', 'manager', 'operator'] },
+      ]
+    },
+    {
+      title: 'Inclusión Financiera',
+      items: [
+        { text: 'Identificación de Baja Bancarización', icon: <MdAnalytics size={20} />, path: '/financial-intelligence', allowedRoles: ['admin', 'manager', 'operator'] },
+      ]
+    },
+    {
+      title: 'Cooperación y Desarrollo',
+      items: [
+        { text: 'Monitoreo Territorial de Programas', icon: <MdSupportAgent size={20} />, path: '/territorial-communication', allowedRoles: ['admin', 'manager', 'operator'] },
+        { text: 'Dashboard Cooperación y Desarrollo', icon: <MdSupportAgent size={20} />, path: '/abaco-verticales/cooperacion-desarrollo/dashboard', allowedRoles: ['admin', 'manager', 'operator'] },
       ]
     },
     {
@@ -154,14 +191,15 @@ export default function Layout({ children }) {
     .toUpperCase()
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: theme.palette.background.default }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#0a0a0a', color: '#fff', fontFamily: 'Montserrat, Arial, sans-serif', transition: 'background 0.4s' }}>
       <AppBar 
         position="fixed" 
-        elevation={1}
+        elevation={0}
         sx={{ 
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: '#ffffff',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+          bgcolor: 'rgba(10,10,10,0.92)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          boxShadow: '0 2px 24px 0 rgba(0,0,0,0.18)'
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -253,6 +291,15 @@ export default function Layout({ children }) {
           </Box>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+            <Tooltip title={mode === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
+              <IconButton
+                onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+                sx={{ color: '#fff', ml: 1 }}
+                aria-label={mode === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+              >
+                {mode === 'dark' ? <MdLightMode size={22} /> : <MdDarkMode size={22} />}
+              </IconButton>
+            </Tooltip>
             {!isMobile && (
               <>
                 <Select
@@ -389,8 +436,9 @@ export default function Layout({ children }) {
             width: isMobile ? drawerWidth : (open ? drawerWidth : 80),
             boxSizing: 'border-box',
             mt: '64px',
-            bgcolor: '#ffffff',
-            borderRight: '1px solid rgba(0, 0, 0, 0.04)',
+            bgcolor: '#181818',
+            color: '#fff',
+            borderRight: '1px solid rgba(255,255,255,0.04)',
             overflow: 'hidden',
             transition: theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
@@ -548,6 +596,9 @@ export default function Layout({ children }) {
           flexGrow: 1, 
           p: { xs: 1.5, sm: 2, md: 3 }, 
           mt: 8,
+          minHeight: '100vh',
+          background: 'radial-gradient(ellipse at 60% 0%, #23272f 0%, #0a0a0a 100%)',
+          color: '#fff',
           ...(currentMode.animated
             ? {
                 animation: 'modePageFlow 420ms ease-out',

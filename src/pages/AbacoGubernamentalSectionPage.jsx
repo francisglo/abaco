@@ -14,6 +14,10 @@ const governmentalModules = [
 ]
 
 export default function AbacoGubernamentalSectionPage() {
+    React.useEffect(() => {
+      document.body.classList.add('fade-page');
+      return () => document.body.classList.remove('fade-page');
+    }, []);
   const theme = useTheme()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -38,15 +42,15 @@ export default function AbacoGubernamentalSectionPage() {
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
               <MdCorporateFare size={30} color={theme.palette.primary.main} />
               <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
-                ÁBACO Gubernamental
+                Inteligencia Territorial Pública
               </Typography>
             </Stack>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 820 }}>
-              División gubernamental con foco en gestión pública, indicadores, inteligencia estratégica y atención ciudadana.
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, maxWidth: 820, fontWeight: 500 }}>
+              Apoyo a la gestión y planificación gubernamental: indicadores de gestión, inteligencia estratégica y monitoreo de atención ciudadana.
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }}>
               <Chip label="Gestión pública" color="primary" variant="outlined" />
-              <Chip label="Toma de decisiones" color="secondary" variant="outlined" />
+              <Chip label="Planificación territorial" color="secondary" variant="outlined" />
             </Stack>
           </CardContent>
         </Card>

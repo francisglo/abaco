@@ -1,6 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { ThemeModeProvider } from './context/ThemeModeContext'
 import './styles.css'
 import 'leaflet/dist/leaflet.css'
 import { Provider } from 'react-redux'
@@ -15,9 +16,11 @@ root.render(
     <Provider store={store}>
       <AuthProvider>
         <ViewProvider>
-          <ErrorBoundary>
-            <App />
-          </ErrorBoundary>
+          <ThemeModeProvider>
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
+          </ThemeModeProvider>
         </ViewProvider>
       </AuthProvider>
     </Provider>

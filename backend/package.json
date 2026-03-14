@@ -14,6 +14,7 @@
     "db:migrate:postgis": "node scripts/migrate-postgis-sync.js",
     "db:migrate:advanced": "node scripts/migrate-advanced-security-analytics.js",
     "db:migrate:auth-username": "node scripts/migrate-auth-username.js",
+    "db:migrate:auth-pin-pattern": "node scripts/migrate-auth-pin-pattern.js",
     "db:migrate:op-logs": "node scripts/migrate-operational-algorithm-logs.js",
     "db:migrate:op-decisions": "node scripts/migrate-operational-decision-log.js",
     "db:migrate:ledger": "node scripts/migrate-ledger.js",
