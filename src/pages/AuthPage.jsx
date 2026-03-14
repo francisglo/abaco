@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState, useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import { getGoogleClientId } from '../utils/env'
 import abacoLogo from '../../TFG/TFG.png';
-import { Alert, alpha, Avatar, Box, Button, Card, CardContent, CircularProgress, Divider, Fade, Grow, InputAdornment, Paper, Stack, Typography, Tabs, Tab, Slide, TextField } from '@mui/material';
+import { Alert, alpha, Avatar, Box, Button, Card, CardContent, CircularProgress, Divider, Fade, Grow, InputAdornment, Paper, Stack, Typography, Tabs, Tab, Slide, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { MdArrowUpward, MdArrowDownward, MdArrowBack, MdArrowForward, MdSpaceBar } from 'react-icons/md';
 import { MdLockOutline, MdOutlineMail, MdPersonAddAlt1 } from 'react-icons/md';
 
 // Utilidades fuera del componente
@@ -33,7 +34,8 @@ export default function AuthPage() {
     method: 'password',
     password: '',
     pin: '',
-    pattern: ''
+    pattern: '',
+    patternMode: 'buttons', // 'buttons' o 'text'
   });
   const [loading, setLoading] = useState(false);
   const [registerForm, setRegisterForm] = useState({
@@ -45,8 +47,32 @@ export default function AuthPage() {
     phone: '',
     bio: '',
     pin: '',
-    pattern: ''
+    pattern: '',
+    patternMode: 'buttons',
   });
+    // Opciones de patrón
+    const patternOptions = [
+      { value: 'U', icon: <MdArrowUpward /> },
+      { value: 'D', icon: <MdArrowDownward /> },
+      { value: 'L', icon: <MdArrowBack /> },
+      { value: 'R', icon: <MdArrowForward /> },
+      { value: 'S', icon: <MdSpaceBar /> },
+    ];
+
+    const handlePatternButton = (formType, value) => {
+      if (formType === 'login') {
+        setLoginForm((prev) => ({ ...prev, pattern: prev.pattern + value }));
+      } else {
+        setRegisterForm((prev) => ({ ...prev, pattern: prev.pattern + value }));
+      }
+    };
+    const handlePatternBackspace = (formType) => {
+      if (formType === 'login') {
+        setLoginForm((prev) => ({ ...prev, pattern: prev.pattern.slice(0, -1) }));
+      } else {
+        setRegisterForm((prev) => ({ ...prev, pattern: prev.pattern.slice(0, -1) }));
+      }
+    };
   const googleButtonRef = useRef(null);
   // ...existing code...
   const onChangeLogin = (field) => (event) => {
@@ -395,80 +421,164 @@ export default function AuthPage() {
               <Typography variant="h5" fontWeight={700}>
                 {tab === 0 ? 'Iniciar sesión' : 'Crear cuenta'}
               </Typography>
+              {/* Selector de método SINE */}
+              <Box sx={{ my: 1 }}>
+                <ToggleButtonGroup
+                  value={tab === 0 ? loginForm.method : registerForm.method}
+                  exclusive
+                  onChange={(e, v) => {
+                    if (!v) return;
+                    if (tab === 0) setLoginForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }));
+                    else setRegisterForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }));
+                  }}
+                  size="small"
+                  color="primary"
+                  sx={{ mb: 1 }}
+                >
+                  <ToggleButton value="password">Contraseña</ToggleButton>
+                  <ToggleButton value="pin">PIN</ToggleButton>
+                  <ToggleButton value="pattern">Patrón</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
               <Typography variant="body2" color="text.secondary">
                 {tab === 0
                   ? 'Ingresa tus credenciales para continuar.'
                   : 'Completa tus datos para crear un nuevo usuario.'}
               </Typography>
 
-              <Tabs
-                value={tab}
-                onChange={(_, value) => setTab(value)}
-                variant="fullWidth"
-                sx={{
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                  borderRadius: 2,
-                  minHeight: 42,
-                  border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                  '& .MuiTabs-indicator': {
-                    height: '100%',
-                    borderRadius: 1.5,
-                    background: (theme) => `linear-gradient(120deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                    zIndex: 0
-                  },
-                  '& .MuiTab-root': {
-                    minHeight: 42,
-                    zIndex: 1,
-                    fontWeight: 600,
-                    color: 'text.secondary'
-                  },
-                  '& .MuiTab-root.Mui-selected': {
-                    color: 'primary.contrastText'
-                  }
-                }}
-              >
-                <Tab label="Iniciar sesión" />
-                <Tab label="Crear cuenta" />
-              </Tabs>
-
-              {error && <Alert severity="error">{error}</Alert>}
-
-              <Fade in timeout={260} key={tab}>
-                <Box>
-                  {tab === 0 ? (
-                    <Slide in direction="left" timeout={260} appear={false}>
-                      <Box component="form" onSubmit={onSubmitLogin}>
-                        <Stack spacing={2}>
+              {tab === 0 ? (
+                <form onSubmit={onSubmitLogin}>
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Correo, usuario o teléfono"
+                      value={loginForm.identifier}
+                      onChange={onChangeLogin('identifier')}
+                      fullWidth
+                      autoFocus
+                    />
+                    {loginForm.method === 'password' && (
+                      <TextField
+                        label="Contraseña"
+                        type="password"
+                        value={loginForm.password}
+                        onChange={onChangeLogin('password')}
+                        fullWidth
+                      />
+                    )}
+                    {loginForm.method === 'pin' && (
+                      <TextField
+                        label="PIN"
+                        type="password"
+                        value={loginForm.pin}
+                        onChange={onChangeLogin('pin')}
+                        fullWidth
+                        inputProps={{ maxLength: 12 }}
+                      />
+                    )}
+                    {loginForm.method === 'pattern' && (
+                      <>
+                        <ToggleButtonGroup
+                          value={loginForm.patternMode}
+                          exclusive
+                          onChange={(e, v) => v && setLoginForm((prev) => ({ ...prev, patternMode: v, pattern: '' }))}
+                          size="small"
+                          sx={{ mb: 1 }}
+                        >
+                          <ToggleButton value="buttons">Botones</ToggleButton>
+                          <ToggleButton value="text">Texto</ToggleButton>
+                        </ToggleButtonGroup>
+                        {loginForm.patternMode === 'buttons' ? (
+                          <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                            {patternOptions.map(opt => (
+                              <IconButton key={opt.value} onClick={() => handlePatternButton('login', opt.value)}>{opt.icon}</IconButton>
+                            ))}
+                            <Button size="small" onClick={() => handlePatternBackspace('login')}>Borrar</Button>
+                          </Box>
+                        ) : (
+                          <TextField
+                            label="Patrón (ej: UDLR)"
+                            value={loginForm.pattern}
+                            onChange={onChangeLogin('pattern')}
+                            fullWidth
+                          />
+                        )}
+                        <Box sx={{ fontSize: 18, fontWeight: 600, letterSpacing: 2, mb: 1 }}>
+                          {loginForm.pattern.split('').map((c, i) => {
+                            const opt = patternOptions.find(o => o.value === c);
+                            return <span key={i}>{opt ? opt.icon : c}</span>;
+                          })}
+                        </Box>
+                      </>
+                    )}
                           <TextField
                             label="Usuario o correo"
                             value={loginForm.identifier}
                             onChange={onChangeLogin('identifier')}
-                            required
-                            fullWidth
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <MdOutlineMail />
-                                </InputAdornment>
-                              )
-                            }}
-                          />
-                          <Tabs
-                            value={loginForm.method}
-                            onChange={onChangeLoginMethod}
-                            indicatorColor="primary"
-                            textColor="primary"
-                            variant="fullWidth"
-                            sx={{ mb: 1 }}
-                          >
-                            <Tab value="password" label="Contraseña" />
-                            <Tab value="pin" label="PIN" />
-                            <Tab value="pattern" label="Patrón" />
-                          </Tabs>
-                          {loginForm.method === 'password' && (
-                            <TextField
-                              label="Contraseña"
-                              type="password"
+                            ) : (
+                              <form onSubmit={onSubmitRegister}>
+                                <Stack spacing={2}>
+                                  <TextField label="Nombre completo" value={registerForm.name} onChange={onChangeRegister('name')} fullWidth />
+                                  <TextField label="Usuario" value={registerForm.username} onChange={onChangeRegister('username')} fullWidth />
+                                  <TextField label="Correo electrónico" value={registerForm.email} onChange={onChangeRegister('email')} fullWidth />
+                                  <TextField label="Teléfono" value={registerForm.phone} onChange={onChangeRegister('phone')} fullWidth />
+                                  <TextField label="Biografía" value={registerForm.bio} onChange={onChangeRegister('bio')} fullWidth multiline minRows={2} />
+                                  {/* Selector de método SINE en registro */}
+                                  <ToggleButtonGroup
+                                    value={registerForm.method}
+                                    exclusive
+                                    onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }))}
+                                    size="small"
+                                    color="primary"
+                                    sx={{ mb: 1 }}
+                                  >
+                                    <ToggleButton value="password">Contraseña</ToggleButton>
+                                    <ToggleButton value="pin">PIN</ToggleButton>
+                                    <ToggleButton value="pattern">Patrón</ToggleButton>
+                                  </ToggleButtonGroup>
+                                  {registerForm.method === 'password' && (
+                                    <>
+                                      <TextField label="Contraseña" type="password" value={registerForm.password} onChange={onChangeRegister('password')} fullWidth />
+                                      <TextField label="Confirmar contraseña" type="password" value={registerForm.confirmPassword} onChange={onChangeRegister('confirmPassword')} fullWidth />
+                                    </>
+                                  )}
+                                  {registerForm.method === 'pin' && (
+                                    <TextField label="PIN" type="password" value={registerForm.pin} onChange={onChangeRegister('pin')} fullWidth inputProps={{ maxLength: 12 }} />
+                                  )}
+                                  {registerForm.method === 'pattern' && (
+                                    <>
+                                      <ToggleButtonGroup
+                                        value={registerForm.patternMode}
+                                        exclusive
+                                        onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, patternMode: v, pattern: '' }))}
+                                        size="small"
+                                        sx={{ mb: 1 }}
+                                      >
+                                        <ToggleButton value="buttons">Botones</ToggleButton>
+                                        <ToggleButton value="text">Texto</ToggleButton>
+                                      </ToggleButtonGroup>
+                                      {registerForm.patternMode === 'buttons' ? (
+                                        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                                          {patternOptions.map(opt => (
+                                            <IconButton key={opt.value} onClick={() => handlePatternButton('register', opt.value)}>{opt.icon}</IconButton>
+                                          ))}
+                                          <Button size="small" onClick={() => handlePatternBackspace('register')}>Borrar</Button>
+                                        </Box>
+                                      ) : (
+                                        <TextField
+                                          label="Patrón (ej: UDLR)"
+                                          value={registerForm.pattern}
+                                          onChange={onChangeRegister('pattern')}
+                                          fullWidth
+                                        />
+                                      )}
+                                      <Box sx={{ fontSize: 18, fontWeight: 600, letterSpacing: 2, mb: 1 }}>
+                                        {registerForm.pattern.split('').map((c, i) => {
+                                          const opt = patternOptions.find(o => o.value === c);
+                                          return <span key={i}>{opt ? opt.icon : c}</span>;
+                                        })}
+                                      </Box>
+                                    </>
+                                  )}
                               value={loginForm.password}
                               onChange={onChangeLogin('password')}
                               required
