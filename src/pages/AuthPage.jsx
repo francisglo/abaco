@@ -28,6 +28,7 @@ export default function AuthPage() {
       return () => clearTimeout(timer);
     }, []);
   const [tab, setTab] = useState(0);
+  const [showKID, setShowKID] = useState(false);
   const [error, setError] = useState('');
   const [loginForm, setLoginForm] = useState({
     identifier: '',
@@ -419,8 +420,23 @@ export default function AuthPage() {
           <CardContent sx={{ flex: 1, p: { xs: 2.5, md: 4 } }}>
             <Stack spacing={2.25}>
               <Typography variant="h5" fontWeight={700}>
-                {tab === 0 ? 'Iniciar sesión' : 'Crear cuenta'}
+                {tab === 0 ? 'Iniciar sesión' : (showKID ? 'Crear cuenta con KID — Key Identity' : 'Crear cuenta')}
               </Typography>
+              {tab === 1 && !showKID && (
+                <>
+                  <Button variant="contained" fullWidth sx={{ my: 1, fontWeight: 700 }} onClick={() => setShowKID(false)}>
+                    Crear cuenta con Email
+                  </Button>
+                  <Box sx={{ display: 'flex', alignItems: 'center', my: 1 }}>
+                    <Divider sx={{ flex: 1 }} />
+                    <Typography sx={{ mx: 2, color: 'text.secondary', fontWeight: 600 }}>o</Typography>
+                    <Divider sx={{ flex: 1 }} />
+                  </Box>
+                  <Button variant="outlined" color="secondary" fullWidth sx={{ fontWeight: 700 }} onClick={() => setShowKID(true)}>
+                    Crear cuenta con KID — Key Identity
+                  </Button>
+                </>
+              )}
               {/* Selector de método SINE */}
               <Box sx={{ my: 1 }}>
                 <ToggleButtonGroup
@@ -440,12 +456,6 @@ export default function AuthPage() {
                   <ToggleButton value="pattern">Patrón</ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                {tab === 0
-                  ? 'Ingresa tus credenciales para continuar.'
-                  : 'Completa tus datos para crear un nuevo usuario.'}
-              </Typography>
-
               {tab === 0 ? (
                 <form onSubmit={onSubmitLogin}>
                   <Stack spacing={2}>
@@ -510,76 +520,104 @@ export default function AuthPage() {
                         </Box>
                       </>
                     )}
+                  </Stack>
+                  <Button type="submit" variant="contained" fullWidth sx={{ mt: 2, fontWeight: 700 }} disabled={loading}>
+                    Entrar
+                  </Button>
+                </form>
+              ) : showKID ? (
+                <form onSubmit={onSubmitRegister}>
+                  <Stack spacing={2}>
+                    <TextField label="Usuario" value={registerForm.username} onChange={onChangeRegister('username')} fullWidth />
+                    {/* Selector de método KID */}
+                    <ToggleButtonGroup
+                      value={registerForm.method}
+                      exclusive
+                      onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }))}
+                      size="small"
+                      color="primary"
+                      sx={{ mb: 1 }}
+                    >
+                      <ToggleButton value="pin">PIN</ToggleButton>
+                      <ToggleButton value="pattern">Patrón</ToggleButton>
+                    </ToggleButtonGroup>
+                    {registerForm.method === 'pin' && (
+                      <TextField label="PIN" type="password" value={registerForm.pin} onChange={onChangeRegister('pin')} fullWidth inputProps={{ maxLength: 12 }} />
+                    )}
+                    {registerForm.method === 'pattern' && (
+                      <>
+                        <ToggleButtonGroup
+                          value={registerForm.patternMode}
+                          exclusive
+                          onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, patternMode: v, pattern: '' }))}
+                          size="small"
+                          sx={{ mb: 1 }}
+                        >
+                          <ToggleButton value="buttons">Botones</ToggleButton>
+                          <ToggleButton value="text">Texto</ToggleButton>
+                        </ToggleButtonGroup>
+                        {registerForm.patternMode === 'buttons' ? (
+                          <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                            {patternOptions.map(opt => (
+                              <IconButton key={opt.value} onClick={() => handlePatternButton('register', opt.value)}>{opt.icon}</IconButton>
+                            ))}
+                            <Button size="small" onClick={() => handlePatternBackspace('register')}>Borrar</Button>
+                          </Box>
+                        ) : (
                           <TextField
-                            label="Usuario o correo"
-                            value={loginForm.identifier}
-                            onChange={onChangeLogin('identifier')}
-                            ) : (
-                              <form onSubmit={onSubmitRegister}>
-                                <Stack spacing={2}>
-                                  <TextField label="Nombre completo" value={registerForm.name} onChange={onChangeRegister('name')} fullWidth />
-                                  <TextField label="Usuario" value={registerForm.username} onChange={onChangeRegister('username')} fullWidth />
-                                  <TextField label="Correo electrónico" value={registerForm.email} onChange={onChangeRegister('email')} fullWidth />
-                                  <TextField label="Teléfono" value={registerForm.phone} onChange={onChangeRegister('phone')} fullWidth />
-                                  <TextField label="Biografía" value={registerForm.bio} onChange={onChangeRegister('bio')} fullWidth multiline minRows={2} />
-                                  {/* Selector de método SINE en registro */}
-                                  <ToggleButtonGroup
-                                    value={registerForm.method}
-                                    exclusive
-                                    onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }))}
-                                    size="small"
-                                    color="primary"
-                                    sx={{ mb: 1 }}
-                                  >
-                                    <ToggleButton value="password">Contraseña</ToggleButton>
-                                    <ToggleButton value="pin">PIN</ToggleButton>
-                                    <ToggleButton value="pattern">Patrón</ToggleButton>
-                                  </ToggleButtonGroup>
-                                  {registerForm.method === 'password' && (
-                                    <>
-                                      <TextField label="Contraseña" type="password" value={registerForm.password} onChange={onChangeRegister('password')} fullWidth />
-                                      <TextField label="Confirmar contraseña" type="password" value={registerForm.confirmPassword} onChange={onChangeRegister('confirmPassword')} fullWidth />
-                                    </>
-                                  )}
-                                  {registerForm.method === 'pin' && (
-                                    <TextField label="PIN" type="password" value={registerForm.pin} onChange={onChangeRegister('pin')} fullWidth inputProps={{ maxLength: 12 }} />
-                                  )}
-                                  {registerForm.method === 'pattern' && (
-                                    <>
-                                      <ToggleButtonGroup
-                                        value={registerForm.patternMode}
-                                        exclusive
-                                        onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, patternMode: v, pattern: '' }))}
-                                        size="small"
-                                        sx={{ mb: 1 }}
-                                      >
-                                        <ToggleButton value="buttons">Botones</ToggleButton>
-                                        <ToggleButton value="text">Texto</ToggleButton>
-                                      </ToggleButtonGroup>
-                                      {registerForm.patternMode === 'buttons' ? (
-                                        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                                          {patternOptions.map(opt => (
-                                            <IconButton key={opt.value} onClick={() => handlePatternButton('register', opt.value)}>{opt.icon}</IconButton>
-                                          ))}
-                                          <Button size="small" onClick={() => handlePatternBackspace('register')}>Borrar</Button>
-                                        </Box>
-                                      ) : (
-                                        <TextField
-                                          label="Patrón (ej: UDLR)"
-                                          value={registerForm.pattern}
-                                          onChange={onChangeRegister('pattern')}
-                                          fullWidth
-                                        />
-                                      )}
-                                      <Box sx={{ fontSize: 18, fontWeight: 600, letterSpacing: 2, mb: 1 }}>
-                                        {registerForm.pattern.split('').map((c, i) => {
-                                          const opt = patternOptions.find(o => o.value === c);
-                                          return <span key={i}>{opt ? opt.icon : c}</span>;
-                                        })}
-                                      </Box>
-                                    </>
-                                  )}
-                              value={loginForm.password}
+                            label="Patrón (ej: UDLR)"
+                            value={registerForm.pattern}
+                            onChange={onChangeRegister('pattern')}
+                            fullWidth
+                          />
+                        )}
+                        <Box sx={{ fontSize: 18, fontWeight: 600, letterSpacing: 2, mb: 1 }}>
+                          {registerForm.pattern.split('').map((c, i) => {
+                            const opt = patternOptions.find(o => o.value === c);
+                            return <span key={i}>{opt ? opt.icon : c}</span>;
+                          })}
+                        </Box>
+                      </>
+                    )}
+                  </Stack>
+                  <Button type="submit" variant="contained" fullWidth sx={{ mt: 2, fontWeight: 700 }} disabled={loading}>
+                    Crear cuenta con KID
+                  </Button>
+                  <Button fullWidth sx={{ mt: 1 }} onClick={() => setShowKID(false)}>
+                    Volver al registro clásico
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={onSubmitRegister}>
+                  <Stack spacing={2}>
+                    <TextField label="Nombre completo" value={registerForm.name} onChange={onChangeRegister('name')} fullWidth />
+                    <TextField label="Usuario" value={registerForm.username} onChange={onChangeRegister('username')} fullWidth />
+                    <TextField label="Correo electrónico" value={registerForm.email} onChange={onChangeRegister('email')} fullWidth />
+                    <TextField label="Teléfono" value={registerForm.phone} onChange={onChangeRegister('phone')} fullWidth />
+                    <TextField label="Biografía" value={registerForm.bio} onChange={onChangeRegister('bio')} fullWidth multiline minRows={2} />
+                    {/* Selector de método clásico */}
+                    <ToggleButtonGroup
+                      value={registerForm.method}
+                      exclusive
+                      onChange={(e, v) => v && setRegisterForm((prev) => ({ ...prev, method: v, password: '', pin: '', pattern: '' }))}
+                      size="small"
+                      color="primary"
+                      sx={{ mb: 1 }}
+                    >
+                      <ToggleButton value="password">Contraseña</ToggleButton>
+                    </ToggleButtonGroup>
+                    {registerForm.method === 'password' && (
+                      <>
+                        <TextField label="Contraseña" type="password" value={registerForm.password} onChange={onChangeRegister('password')} fullWidth />
+                        <TextField label="Confirmar contraseña" type="password" value={registerForm.confirmPassword} onChange={onChangeRegister('confirmPassword')} fullWidth />
+                      </>
+                    )}
+                  </Stack>
+                  <Button type="submit" variant="contained" fullWidth sx={{ mt: 2, fontWeight: 700 }} disabled={loading}>
+                    Crear cuenta
+                  </Button>
+                </form>
+              )}
                               onChange={onChangeLogin('password')}
                               required
                               fullWidth
