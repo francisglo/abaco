@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import { Box, Container, Typography, Grid, Card, CardContent, Button, CardActions, useTheme, alpha, Stack, LinearProgress } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -370,28 +371,37 @@ export default function HomePage() {
             { title: 'Portal Administración', path: '/portales', label: 'Usuarios y control' }
           ].map((portal) => (
             <Grid item xs={12} sm={6} md={3} key={portal.title}>
-              <Card
-                onClick={() => navigate(portal.path)}
-                sx={{
-                  cursor: 'pointer',
-                  borderRadius: 3,
-                  border: 'none',
-                  background: 'rgba(24,28,36,0.92)',
-                  color: '#fff',
-                  minHeight: 140,
-                  boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover': {
-                    background: 'rgba(40,44,56,0.98)',
-                    boxShadow: '0 8px 40px 0 rgba(0,0,0,0.28)',
-                    transform: 'translateY(-4px) scale(1.03)'
-                  }
+              <motion.div
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow: '0 0 24px 4px #00fff7, 0 8px 40px 0 rgba(0,0,0,0.28)',
+                  filter: 'brightness(1.08) saturate(1.2) drop-shadow(0 0 12px #00fff7cc)'
                 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.1 }}
+                style={{ width: '100%' }}
+                tabIndex={0}
+                onClick={() => navigate(portal.path)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate(portal.path) }}
               >
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    borderRadius: 3,
+                    border: 'none',
+                    background: 'rgba(24,28,36,0.92)',
+                    color: '#fff',
+                    minHeight: 140,
+                    boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                  }}
+                >
                 <CardContent sx={{ textAlign: 'center', p: 2 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff', fontSize: '1.18rem', letterSpacing: '0.01em' }}>
                     {portal.title}
@@ -400,7 +410,8 @@ export default function HomePage() {
                     {portal.label}
                   </Typography>
                 </CardContent>
-              </Card>
+                </Card>
+              </motion.div>
             </Grid>
           ))}
         </Grid>
@@ -433,31 +444,38 @@ export default function HomePage() {
         <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           {modules.map((module, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <Card
+              <motion.div
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow: `0 0 24px 4px ${module.color}, 0 8px 40px 0 rgba(0,0,0,0.28)`,
+                  filter: `brightness(1.08) saturate(1.2) drop-shadow(0 0 12px ${module.color}cc)`
+                }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.12 + index * 0.04 }}
+                style={{ height: '100%' }}
                 role="region"
                 aria-label={`Módulo ${module.title}`}
                 tabIndex={0}
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: 'rgba(24,28,36,0.92)',
-                  color: '#fff',
-                  borderRadius: 3,
-                  border: 'none',
-                  boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover, &:focus': {
-                    background: 'rgba(40,44,56,0.98)',
-                    boxShadow: '0 8px 40px 0 rgba(0,0,0,0.28)',
-                    transform: 'translateY(-4px) scale(1.03)'
-                  }
-                }}
                 onClick={() => navigate(module.path)}
                 onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate(module.path) }}
               >
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'rgba(24,28,36,0.92)',
+                    color: '#fff',
+                    borderRadius: 3,
+                    border: 'none',
+                    boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18)',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                  }}
+                >
                 <CardContent sx={{ flex: 1, pb: 2, textAlign: 'center' }}>
                   <Tooltip title={module.title + ': ' + module.description} arrow>
                     <Box
@@ -562,7 +580,8 @@ export default function HomePage() {
                     </Button>
                   </Tooltip>
                 </CardActions>
-              </Card>
+                </Card>
+              </motion.div>
             </Grid>
           ))}
         </Grid>
@@ -716,53 +735,62 @@ export default function HomePage() {
         </Box>
 
         <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-          {useCases.map((block) => (
+          {useCases.map((block, idx) => (
             <Grid item xs={12} md={6} key={block.title}>
-              <Card
-                role="region"
-                aria-label={`Casos de uso: ${block.title}`}
-                tabIndex={0}
-                sx={{
-                  height: '100%',
-                  background: 'rgba(24,28,36,0.92)',
-                  color: '#fff',
-                  borderRadius: 3,
-                  border: 'none',
-                  boxShadow: '0 2px 16px 0 rgba(0,0,0,0.18)',
-                  outline: 'none',
-                  transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
-                  '&:hover, &:focus': {
-                    background: 'rgba(40,44,56,0.98)',
-                    boxShadow: '0 8px 32px 0 rgba(0,0,0,0.28)',
-                    transform: 'translateY(-2px) scale(1.02)'
-                  }
+              <motion.div
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.18 + idx * 0.06 }}
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: '0 0 24px 4px #00fff7, 0 8px 40px 0 rgba(0,0,0,0.28)',
+                  filter: 'brightness(1.08) saturate(1.2) drop-shadow(0 0 12px #00fff7cc)'
                 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ height: '100%' }}
+                tabIndex={0}
               >
-                <CardContent>
-                  <Tooltip title={block.title + ': Casos de uso'} arrow>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: '#fff',
-                        mb: 1.5,
-                        fontSize: '1.08rem',
-                        letterSpacing: '0.01em'
-                      }}
-                      aria-label={`Título de casos de uso: ${block.title}`}
-                    >
-                      {block.title}
-                    </Typography>
-                  </Tooltip>
-                  <Stack spacing={0.9}>
-                    {block.items.map((item) => (
-                      <Typography key={item} variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', lineHeight: 1.6, fontWeight: 400 }}>
-                        {item}
+                <Card
+                  role="region"
+                  aria-label={`Casos de uso: ${block.title}`}
+                  tabIndex={-1}
+                  sx={{
+                    height: '100%',
+                    background: 'rgba(24,28,36,0.92)',
+                    color: '#fff',
+                    borderRadius: 3,
+                    border: 'none',
+                    boxShadow: '0 2px 16px 0 rgba(0,0,0,0.18)',
+                    outline: 'none',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)'
+                  }}
+                >
+                  <CardContent>
+                    <Tooltip title={block.title + ': Casos de uso'} arrow>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          color: '#fff',
+                          mb: 1.5,
+                          fontSize: '1.08rem',
+                          letterSpacing: '0.01em'
+                        }}
+                        aria-label={`Título de casos de uso: ${block.title}`}
+                      >
+                        {block.title}
                       </Typography>
-                    ))}
-                  </Stack>
-                </CardContent>
-              </Card>
+                    </Tooltip>
+                    <Stack spacing={0.9}>
+                      {block.items.map((item) => (
+                        <Typography key={item} variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', lineHeight: 1.6, fontWeight: 400 }}>
+                          {item}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
           ))}
         </Grid>

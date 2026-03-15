@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import {
   Box,
   Container,
@@ -320,22 +321,29 @@ export default function ÁbacoHomePage() {
           <Grid container spacing={3}>
             {numericalAlgorithms.map((algo) => (
               <Grid item xs={12} md={6} lg={4} key={algo.id}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    borderRadius: 2,
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1)',
-                      borderColor: algo.color
-                    }
+                <motion.div
+                  whileHover={{
+                    scale: 1.04,
+                    boxShadow: `0 0 24px 4px ${algo.color}, 0 12px 24px rgba(0,0,0,0.18)`,
+                    filter: `brightness(1.08) saturate(1.2) drop-shadow(0 0 12px ${algo.color}cc)`
                   }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.12 + algo.id * 0.04 }}
+                  style={{ height: '100%' }}
                 >
+                  <Card
+                    elevation={0}
+                    sx={{
+                      borderRadius: 2,
+                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
                   <CardContent sx={{ pb: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                       <Box sx={{ color: algo.color, fontSize: 28 }}>
@@ -377,7 +385,8 @@ export default function ÁbacoHomePage() {
                       Ejecutar
                     </Button>
                   </CardActions>
-                </Card>
+                  </Card>
+                </motion.div>
               </Grid>
             ))}
           </Grid>
@@ -388,22 +397,29 @@ export default function ÁbacoHomePage() {
           <Grid container spacing={3}>
             {mlAlgorithms.map((algo) => (
               <Grid item xs={12} md={6} lg={4} key={algo.id}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    borderRadius: 2,
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1)',
-                      borderColor: algo.color
-                    }
+                <motion.div
+                  whileHover={{
+                    scale: 1.04,
+                    boxShadow: `0 0 24px 4px ${algo.color}, 0 12px 24px rgba(0,0,0,0.18)`,
+                    filter: `brightness(1.08) saturate(1.2) drop-shadow(0 0 12px ${algo.color}cc)`
                   }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.12 + algo.id * 0.04 }}
+                  style={{ height: '100%' }}
                 >
+                  <Card
+                    elevation={0}
+                    sx={{
+                      borderRadius: 2,
+                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
                   <CardContent sx={{ pb: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                       <Box sx={{ color: algo.color, fontSize: 28 }}>
@@ -446,7 +462,8 @@ export default function ÁbacoHomePage() {
                       Pronto
                     </Button>
                   </CardActions>
-                </Card>
+                  </Card>
+                </motion.div>
               </Grid>
             ))}
           </Grid>

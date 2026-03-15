@@ -31,8 +31,9 @@ import {
   MdAccountBalance,
   MdHowToVote,
   MdCorporateFare,
-  MdHub
-} from 'react-icons/md'
+  MdHub,
+  MdNotifications
+} from 'react-icons/md';
 import { HiUsers } from 'react-icons/hi'
 import { RiContactsBook2Fill } from 'react-icons/ri'
 import NotificationsPanel from './NotificationsPanel'

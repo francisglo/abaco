@@ -7,7 +7,7 @@ import { useAuth } from './context/AuthContext'
 
 import theme from './theme'
 import Layout from './components/Layout'
-import ABAssistant from './components/ABAssistant'
+import AlbaWidget from './components/AlbaWidget.jsx'
 import OnboardingTour from './components/OnboardingTour'
 import ErrorBoundary from './components/ErrorBoundary'
 import NetworkStatusBar from './components/NetworkStatusBar'
@@ -105,7 +105,7 @@ export default function App() {
           <NetworkStatusBar />
           <Layout>
             <OnboardingTour />
-            <ABAssistant />
+            <AlbaWidget />
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/" element={<HomePage />} />

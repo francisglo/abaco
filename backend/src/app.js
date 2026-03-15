@@ -14,6 +14,7 @@ import tasksRoutes from './routes/tasks.js';
 import citizenRequestsRoutes from './routes/citizenRequests.js';
 import territorialCommunicationRoutes from './routes/territorialCommunication.js';
 import managementIndicatorsRoutes from './routes/managementIndicators.js';
+import studentProposalsRoutes from './routes/studentProposals.js';
 import strategicIntelligenceRoutes from './routes/strategicIntelligence.js';
 import subscriptionsRoutes from './routes/subscriptions.js';
 import searchRoutes from './routes/search.js';
@@ -158,6 +159,10 @@ app.use('/api/v1/voters', votersRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/zones', zonesRoutes);
 app.use('/api/v1/tasks', tasksRoutes);
+
+// Propuestas y votos estudiantiles
+app.use('/api/student-proposals', studentProposalsRoutes);
+app.use('/api/v1/student-proposals', studentProposalsRoutes);
 
 // Módulo de Gestión de Solicitudes Ciudadanas
 app.use('/api/citizen-requests', citizenRequestsRoutes);

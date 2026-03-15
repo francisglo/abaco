@@ -7,6 +7,9 @@ import votersReducer from './votersSlice'
 import usersReducer from './usersSlice'
 import tasksReducer from './tasksSlice'
 import notificationsReducer from './notificationsSlice'
+import studentProposalsReducer from './studentProposalsSlice'
+import groupsReducer from './groupsSlice'
+import groupChatReducer from './groupChatSlice'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +20,10 @@ export const store = configureStore({
     voters: votersReducer,
     users: usersReducer,
     tasks: tasksReducer,
-    notifications: notificationsReducer
+    notifications: notificationsReducer,
+    studentProposals: studentProposalsReducer,
+    groups: groupsReducer,
+    groupChat: groupChatReducer
   }
 })
 

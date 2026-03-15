@@ -1,3 +1,39 @@
+// === Propuestas y votos estudiantiles ===
+export async function fetchStudentProposals(token) {
+  const res = await fetch(`${API_V1}/student-proposals`, {
+    headers: buildAuthHeaders(token)
+  })
+  if (!res.ok) throw new Error('No se pudo obtener propuestas estudiantiles')
+  return res.json()
+}
+
+export async function createStudentProposal(payload, token) {
+  const res = await fetch(`${API_V1}/student-proposals`, {
+    method: 'POST',
+    headers: { ...buildAuthHeaders(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  if (!res.ok) throw new Error('No se pudo crear la propuesta')
+  return res.json()
+}
+
+export async function voteStudentProposal(payload, token) {
+  const res = await fetch(`${API_V1}/student-proposals/vote`, {
+    method: 'POST',
+    headers: { ...buildAuthHeaders(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  if (!res.ok) throw new Error('No se pudo registrar el voto')
+  return res.json()
+}
+
+export async function fetchStudentProposalVotes(proposalId, token) {
+  const res = await fetch(`${API_V1}/student-proposals/${proposalId}/votes`, {
+    headers: buildAuthHeaders(token)
+  })
+  if (!res.ok) throw new Error('No se pudo obtener votos de la propuesta')
+  return res.json()
+}
 const normalizedApiBase = String(process.env.VITE_API_URL || '').trim().replace(/\/$/, '')
 const API_BASE = normalizedApiBase || 'http://localhost:4000'
 const API_V1 = `${API_BASE}/api/v1`

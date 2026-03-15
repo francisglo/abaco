@@ -6,6 +6,8 @@ import { TextField, InputAdornment, IconButton, MenuItem, Select, Tabs, Tab } fr
 import { MdSearch, MdFilterList } from 'react-icons/md';
 import { Card, CardContent, Button } from '@mui/material';
 import { useGetUsersQuery, useGetPostsQuery, useGetGroupsQuery } from '../api/coworkingApi';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProposals } from '../store/studentProposalsSlice';
 
 // Datos de ejemplo
 const users = [
@@ -31,14 +33,34 @@ export default function CoworkingPage() {
   const { data: users = [] } = useGetUsersQuery();
   const { data: posts = [] } = useGetPostsQuery();
   const { data: groups = [] } = useGetGroupsQuery ? useGetGroupsQuery() : { data: [] };
+  const dispatch = useDispatch();
+  const proposals = useSelector(state => state.studentProposals.proposals);
+  const auth = useSelector(state => state.auth);
+  React.useEffect(() => {
+    if (auth?.user?.id) dispatch(fetchProposals(auth.token));
+  }, [dispatch, auth?.user?.id, auth.token]);
   const filteredUsers = users.filter(user =>
     (!search || user.name.toLowerCase().includes(search.toLowerCase()) || user.bio.toLowerCase().includes(search.toLowerCase())) &&
     (!sector || user.bio.toLowerCase().includes(sector.toLowerCase())) &&
     (!location || user.bio.toLowerCase().includes(location.toLowerCase()))
   );
   const suggested = users.filter(u => !following.includes(u.id) && u.id !== 'me');
-  let feedPosts = posts;
-  if (feedTab === 'network') feedPosts = posts.filter(p => myNetworkIds.includes(p.authorId));
+  // Unificar posts y propuestas estudiantiles en el feed
+  let feedPosts = [
+    ...posts,
+    ...proposals.map(p => ({
+      id: `proposal-${p.id}`,
+      authorId: p.userId?.toString() || 'estudiante',
+      content: `[Propuesta estudiantil] ${p.title}\n${p.description}`,
+      createdAt: p.createdAt,
+      reactions: [],
+      comments: [],
+      isProposal: true
+    }))
+  ];
+  // Ordenar por fecha descendente
+  feedPosts = feedPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  if (feedTab === 'network') feedPosts = feedPosts.filter(p => myNetworkIds.includes(p.authorId));
   if (feedTab === 'trending') feedPosts = trendingPosts;
 
   return (

@@ -7,6 +7,7 @@ import { fetchZones as fetchZonesThunk } from '../store/zonesSlice'
 import { fetchGeoJSON as fetchGeoThunk } from '../store/geoSlice'
 import { fetchUsers } from '../store/authSlice'
 import { Box, Grid, Paper, Typography, Card, CardContent, Avatar, Chip, Tabs, Tab } from '@mui/material'
+import { motion, AnimatePresence } from 'framer-motion'
 import { fetchLogs } from '../api'
 import { MdPeople, MdCheckCircle, MdPending, MdTrendingUp, MdInsights } from 'react-icons/md'
 import { HiLocationMarker } from 'react-icons/hi'
@@ -63,11 +64,16 @@ export default function Dashboard() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            fontWeight: 700, 
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.08 }}
+        style={{ marginBottom: 32 }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
             color: '#1f2937',
             mb: 1,
             display: 'flex',
@@ -82,22 +88,35 @@ export default function Dashboard() {
           Gestión y análisis de contactos en tiempo real
         </Typography>
         {user && (
-          <Chip 
-            label={`Rol: ${user.role}`} 
-            size="small" 
-            color="primary" 
+          <Chip
+            label={`Rol: ${user.role}`}
+            size="small"
+            color="primary"
             sx={{ mt: 1, fontWeight: 600 }}
           />
         )}
-      </Box>
+      </motion.div>
 
       <Grid container spacing={3}>
-        {stats.map((stat, idx) => (
-          <Grid item xs={12} sm={6} md={3} key={idx}>
-            <Card 
-              elevation={0} 
-              sx={{ 
-                p: 2, 
+        <AnimatePresence>
+          {stats.map((stat, idx) => (
+            <Grid item xs={12} sm={6} md={3} key={idx}>
+              <motion.div
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 32 }}
+                transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.18 + idx * 0.06 }}
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow: '0 0 16px 2px #00fff7, 0 4px 24px 0 rgba(0,0,0,0.18)',
+                  filter: 'brightness(1.08) saturate(1.2) drop-shadow(0 0 8px #00fff7cc)'
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 2,
                 borderRadius: 2,
                 border: '1px solid rgba(0, 0, 0, 0.08)',
                 transition: 'all 0.3s ease',

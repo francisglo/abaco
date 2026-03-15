@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchProposals, addProposal, voteProposal } from '../store/studentProposalsSlice'
+import { useSelector as useAuthSelector } from 'react-redux'
 import {
   Alert,
   Box,
@@ -105,15 +108,7 @@ const TRAINING_ROLE_RULES = {
   votante: { view: [0, 3, 5], edit: [], interact: [0, 3] }
 }
 
-const EMPTY_DATA = {
-  proposals: [],
-  events: [],
-  budgets: [],
-  surveys: [],
-  mapIssues: [],
-  announcements: [],
-  commitments: []
-}
+
 
 function withId(payload) {
   return { id: Date.now() + Math.floor(Math.random() * 1000), ...payload }
@@ -128,7 +123,10 @@ export default function AbacoTrainingPage() {
   const [role, setRole] = useState('personero')
   const [tab, setTab] = useState(0)
   const [saved, setSaved] = useState('')
-  const [data, setData] = useState(EMPTY_DATA)
+  const dispatch = useDispatch()
+  const { proposals, loading: proposalsLoading } = useSelector(state => state.studentProposals)
+  const auth = useAuthSelector(state => state.auth)
+  const userId = auth?.user?.id
 
   const [proposal, setProposal] = useState({ title: '', description: '' })
   const [eventForm, setEventForm] = useState({ title: '', date: '', responsible: '' })
@@ -138,33 +136,21 @@ export default function AbacoTrainingPage() {
   const [announcementForm, setAnnouncementForm] = useState({ title: '', message: '', date: '' })
   const [commitmentForm, setCommitmentForm] = useState({ title: '', evidence: '', status: 'pendiente' })
 
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return
-    try {
-      const parsed = JSON.parse(raw)
-      setData({ ...EMPTY_DATA, ...parsed })
-    } catch {
-      setData(EMPTY_DATA)
-    }
-  }, [])
 
+  // Cargar propuestas globales al montar
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  }, [data])
+    if (userId) dispatch(fetchProposals(auth.token))
+  }, [dispatch, userId, auth.token])
 
+
+  // Solo para la barra de progreso, mantener lógica local para otros módulos
   const completion = useMemo(() => {
     const checks = [
-      data.proposals.length > 0,
-      data.events.length > 0,
-      data.budgets.length > 0,
-      data.surveys.length > 0,
-      data.mapIssues.length > 0,
-      data.announcements.length > 0,
-      data.commitments.length > 0
+      proposals.length > 0,
+      /* eventos, presupuestos, encuestas, etc. */ false, false, false, false, false, false
     ]
     return Math.round((checks.filter(Boolean).length / checks.length) * 100)
-  }, [data])
+  }, [proposals])
 
   const budgetTotal = useMemo(
     () => data.budgets.reduce((acc, item) => acc + Number(item.amount || 0), 0),
@@ -189,39 +175,26 @@ export default function AbacoTrainingPage() {
   }
 
   const createProposal = () => {
-    if (!proposal.title.trim()) return
-    setData((prev) => ({
-      ...prev,
-      proposals: [
-        withId({
-          title: proposal.title.trim(),
-          description: proposal.description.trim(),
-          votesYes: 0,
-          votesNo: 0,
-          status: 'debate',
-          createdAt: new Date().toISOString()
-        }),
-        ...prev.proposals
-      ]
+    if (!proposal.title.trim() || !userId) return
+    dispatch(addProposal({
+      payload: {
+        userId,
+        title: proposal.title.trim(),
+        description: proposal.description.trim()
+      },
+      token: auth.token
     }))
     setProposal({ title: '', description: '' })
     savePulse('Iniciativa registrada')
   }
 
-  const voteProposal = (id, vote) => {
-    setData((prev) => ({
-      ...prev,
-      proposals: prev.proposals.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              votesYes: vote === 'yes' ? item.votesYes + 1 : item.votesYes,
-              votesNo: vote === 'no' ? item.votesNo + 1 : item.votesNo,
-              status: 'votación'
-            }
-          : item
-      )
+  const voteProposalHandler = (id, value) => {
+    if (!userId) return
+    dispatch(voteProposal({
+      payload: { proposalId: id, userId, value: value === 'yes' ? 1 : -1 },
+      token: auth.token
     }))
+    savePulse('Voto registrado')
   }
 
   const createEvent = () => {
@@ -454,18 +427,19 @@ export default function AbacoTrainingPage() {
                 </Grid>
               </Box>
               <Stack spacing={1}>
-                {data.proposals.map((item) => (
+                {proposals.map((item) => (
                   <Card key={item.id} variant="outlined" sx={{ borderColor: alpha(theme.palette.primary.main, 0.25) }}>
                     <CardContent sx={{ py: 1.2, '&:last-child': { pb: 1.2 } }}>
                       <Stack spacing={0.9}>
                         <Typography fontWeight={700}>{item.title}</Typography>
                         <Typography variant="body2" color="text.secondary">{item.description || 'Sin descripción'}</Typography>
                         <Stack direction="row" spacing={1} alignItems="center">
-                          <Chip size="small" label={`Sí: ${item.votesYes}`} color="success" variant="outlined" />
-                          <Chip size="small" label={`No: ${item.votesNo}`} color="error" variant="outlined" />
-                          <Chip size="small" label={item.status} />
-                          <Button disabled={!canInteractTab} size="small" variant="outlined" startIcon={<MdHowToVote />} onClick={() => voteProposal(item.id, 'yes')}>Votar Sí</Button>
-                          <Button disabled={!canInteractTab} size="small" variant="outlined" onClick={() => voteProposal(item.id, 'no')}>Votar No</Button>
+                          {/* Los votos pueden requerir fetch adicional si no están en el objeto */}
+                          <Chip size="small" label={`Sí: ${item.votesYes ?? 0}`} color="success" variant="outlined" />
+                          <Chip size="small" label={`No: ${item.votesNo ?? 0}`} color="error" variant="outlined" />
+                          <Chip size="small" label={item.status || 'debate'} />
+                          <Button disabled={!canInteractTab} size="small" variant="outlined" startIcon={<MdHowToVote />} onClick={() => voteProposalHandler(item.id, 'yes')}>Votar Sí</Button>
+                          <Button disabled={!canInteractTab} size="small" variant="outlined" onClick={() => voteProposalHandler(item.id, 'no')}>Votar No</Button>
                         </Stack>
                       </Stack>
                     </CardContent>

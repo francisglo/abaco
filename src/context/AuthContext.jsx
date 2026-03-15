@@ -72,6 +72,15 @@ export function AuthProvider({ children }) {
         setUser(response?.user || null)
       })
       .catch((error) => {
+        // Si el backend responde 401, forzar logout inmediato
+        if (String(error?.message || '').toLowerCase().includes('401') || String(error?.message || '').toLowerCase().includes('token')) {
+          localStorage.removeItem(TOKEN_KEY)
+          setToken('')
+          setUser(null)
+          setAuthReady(true)
+          setLoading(false)
+          return
+        }
         if (AUTH_ALLOW_LOCAL_FALLBACK && isNetworkAuthError(error)) {
           const localUser = findLocalUserByToken(savedToken)
           if (localUser) {
@@ -80,7 +89,6 @@ export function AuthProvider({ children }) {
             return
           }
         }
-
         localStorage.removeItem(TOKEN_KEY)
         setToken('')
         setUser(null)

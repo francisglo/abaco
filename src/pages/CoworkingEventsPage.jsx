@@ -8,13 +8,13 @@ const initialEvents = [
 ];
 
 export default function CoworkingEventsPage() {
-  const [events, setEvents] = useState(initialEvents);
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
+	const [events, setEvents] = useState(initialEvents);
+	const [open, setOpen] = useState(false);
+	const [title, setTitle] = useState('');
+	const [description, setDescription] = useState('');
+	const [date, setDate] = useState('');
 
-  const { data: events = [] } = useGetEventsQuery();
+	const { data: fetchedEvents = [] } = useGetEventsQuery();
 
   const handleCreate = () => {
     if (!title.trim() || !date) return;
