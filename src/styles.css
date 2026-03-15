@@ -28,15 +28,15 @@
   transition: box-shadow 0.22s;
 }
 :root{
-  --bg:#f7f8fb;
-  --card:#ffffff;
-  --accent:#1f6feb;
+  --bg:#0a0a0a;
+  --card:#181a20;
+  --accent:#00d8ff;
 }
 body{
   font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
   margin:0;
-  background:var(--bg);
-  color:#111;
+  background:#0a0a0a;
+  color:#f4faff;
   transition: background 0.4s, color 0.4s;
 }
 
